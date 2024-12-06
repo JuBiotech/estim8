@@ -35,6 +35,7 @@ jobs:
           echo "Compiling $model to FMU"
           omc -s -n=1 <<EOF
           loadModel(Modelica,{"4.0"}); getErrorString();
+          cd("tests/test_data/"); getErrorString();
           loadFile("$model"); getErrorString();
           modelName := $model; getErrorString();
           buildModelFMU(modelName, version=2.0","me_cs","<default>",{"static"},true); getErrorString();
