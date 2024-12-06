@@ -14,7 +14,6 @@ dependencies:
   - seaborn
   - grpclib
   - pytensor
-  - m2w64-toolchain
   - fmpy
   - scikit-learn==1.4.2
   - scikit-optimize
@@ -23,3 +22,5 @@ dependencies:
     # for code testing
     - pytest
     - pytest-cov
+  # [win] specifies that this dependency is only for Windows
+  - m2w64-toolchain  # [win]
