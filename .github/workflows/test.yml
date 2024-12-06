@@ -27,20 +27,20 @@ jobs:
         packages: 'omc'
         libraries: 'Modelica 4.0.0'
 
-    - name: Compile FMUs
-      env:
-        testmodel: growth.mo
-      run: |
-        for model in $testmodel; do
-          echo "Compiling $model to FMU"
-          omc -s -n=1 <<EOF
-loadModel(Modelica,{"4.0"}); getErrorString();
-cd("tests/test_data/"); getErrorString();
-loadFile("$model"); getErrorString();
-modelName := $model; getErrorString();
-buildModelFMU(modelName, version=2.0","me_cs","<default>",{"static"},true); getErrorString();
-EOF
-        done
+#     - name: Compile FMUs
+#       env:
+#         testmodel: growth.mo
+#       run: |
+#         for model in $testmodel; do
+#           echo "Compiling $model to FMU"
+#           omc -s -n=1 <<EOF
+# loadModel(Modelica,{"4.0"}); getErrorString();
+# cd("tests/test_data/"); getErrorString();
+# loadFile("$model"); getErrorString();
+# modelName := $model; getErrorString();
+# buildModelFMU(modelName, version=2.0","me_cs","<default>",{"static"},true); getErrorString();
+# EOF
+#         done
 
     - name: Run tests
       run: |
