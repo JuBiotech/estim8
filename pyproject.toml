@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "estim8"
+version = "0.1.0"
+authors = [
+    {name = "Tobias Latour", email = "t.latour@fz-juelich.de"},
+    {name = "Daniel Strohmeier", email = "d.strohmeier@fz-juelich.de"},
+    ]
+description = "A parameter estimation tool for DAE models implemented in Modelica"
+readme = "README.md"
+requires-python = "<3.11"
+license = {text = "MIT "}
+classifiers=[
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+keywords=["Biorpocessmodeling", "Parameter estimation", "Functional Mockup Interface"]
+dependencies = [
+    "fmpy",
+    "scikit-optimize",
+    "scikit-learn==1.4.2",
+    "matplotlib",
+    "seaborn",
+    "pandas",
+    "numpy",
+    "pytensor-federated",
+    "pytensor",
+    "grpclib",
+]
+
+[tool.setuptools.packages.find]
+include = ["estim8"]
+
+[project.urls]
+GitLab = "https://jugit.fz-juelich.de/t.latour/estim8-s-test"

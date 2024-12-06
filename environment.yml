@@ -1,0 +1,25 @@
+channels:
+- conda-forge
+- default
+dependencies:
+  - boa
+  - conda-build
+  - python==3.10
+  - numpy>=1.17.0,<2
+  - pygmo==2.19.6
+  - pip
+  - pandas
+  - openpyxl
+  - matplotlib
+  - seaborn
+  - grpclib
+  - pytensor
+  - m2w64-toolchain
+  - fmpy
+  - scikit-learn==1.4.2
+  - scikit-optimize
+  - pip:
+    - pytensor-federated
+    # for code testing
+    - pytest
+    - pytest-cov
