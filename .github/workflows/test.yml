@@ -20,12 +20,12 @@ jobs:
         activate-environment: testim8
         environment-file: environment.yml
 
-    - name: Set up OpenModelica
-      uses: OpenModelica/setup-openmodelica@v1.0.1
-      with: 
-        version: 'stable'
-        packages: 'omc'
-        libraries: 'Modelica 4.0.0'
+    # - name: Set up OpenModelica
+    #   uses: OpenModelica/setup-openmodelica@v1.0.1
+    #   with: 
+    #     version: 'stable'
+    #     packages: 'omc'
+    #     libraries: 'Modelica 4.0.0'
 
 #     - name: Compile FMUs
 #       env:
@@ -44,6 +44,7 @@ jobs:
 
     - name: Run tests
       run: |
+        conda init
         conda activate testim8
         pytest -v --cov=estim8 --cov-report xml --covreport term-missing estim8
     - name: Upload coverage
