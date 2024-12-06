@@ -22,5 +22,4 @@ dependencies:
     # for code testing
     - pytest
     - pytest-cov
-  # [win] specifies that this dependency is only for Windows
-  - m2w64-toolchain  # [win]
+  # - m2w64-toolchain  # [win]
