@@ -1,0 +1,56 @@
+name: Run Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: '3.10'
+        activate-environment: testim8
+        environment-file: environment.yml
+
+    - name: Compile FMUs
+      uses: OpenModelica/setup-openmodelica@v1.0.1
+      with: 
+        version: 'stable'
+        packages: 'omc'
+        libraries: 'Modelica 4.0.0'
+      env:
+        testmodel: growth.mo
+      run: |
+        for model in $testmodel; do
+          echo "Compiling $model to FMU"
+          omc -s -n=1 <<EOF
+          loadModel(Modelica,{"4.0"}); getErrorString();
+          loadFile("$model"); getErrorString();
+          modelName := $model; getErrorString();
+          buildModelFMU(modelName, version=2.0","me_cs","<default>",{"static"},true); getErrorString();
+          EOF
+        done
+
+    - name: Run tests
+      run: |
+        conda activate testim8
+        pytest -v --cov=estim8 --cov-report xml --covreport term-missing estim8
+    - name: Upload coverage
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+    - name: Test Wheel build, install and import
+      run: |
+        python setup.py bdist_wheel
+        twine check dist/*
+        cd dist
+        pip install estim8*.whl
+        python -c "import estim8; print(estim8.__version__)"

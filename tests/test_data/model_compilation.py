@@ -6,7 +6,6 @@ def compileModel(modelname):
     MO_model = ModelicaSystem(modelpath, modelname)
     # compile
     fmu = MO_model.convertMo2Fmu()
-
     return fmu
 
 
