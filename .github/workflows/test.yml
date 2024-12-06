@@ -20,12 +20,14 @@ jobs:
         activate-environment: testim8
         environment-file: environment.yml
 
-    - name: Compile FMUs
+    - name: Set up OpenModelica
       uses: OpenModelica/setup-openmodelica@v1.0.1
       with: 
         version: 'stable'
         packages: 'omc'
         libraries: 'Modelica 4.0.0'
+
+    - name: Compile FMUs
       env:
         testmodel: growth.mo
       run: |
