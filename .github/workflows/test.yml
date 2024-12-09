@@ -24,7 +24,7 @@ jobs:
     - name: Run tests
       shell: bash -l {0}
       run: |
-        pytest -v --cov=estim8 --cov-report xml --cov-report term-missing estim8
+        pytest -v --cov=estim8 --cov-report xml --cov-report term-missing estim8 tests/
 
     - name: Upload coverage
       uses: codecov/codecov-action@v4
