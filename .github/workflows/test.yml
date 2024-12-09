@@ -25,6 +25,7 @@ jobs:
         conda info
     - name: Run tests
       run: |
+        conda activate testim8
         pytest -v --cov=estim8 --cov-report xml --covreport term-missing estim8
     - name: Upload coverage
       uses: codecov/codecov-action@v4
