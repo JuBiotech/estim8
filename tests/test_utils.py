@@ -64,3 +64,15 @@ class TestEstimatorHelpers:
         replicate = replicate[replicate_ID]
 
         assert replicate_ID == replicate.replicate_ID
+
+    
+    @pytest.mark.parametrize("replicate_IDs", [[None], ["1st", "2nd"]])
+    def test_make_tensor_function(self, replicate_IDs):
+        f = lambda x: x**2
+
+        func = EstimatorHelpers.make_tensor_function(f, replicate_IDs=replicate_IDs)
+
+        inputs = [[1] * len(replicate_IDs)]
+        func(*inputs)
+
+
