@@ -18,7 +18,6 @@ jobs:
       with:
         python-version: '3.10'
         auto-activate-base: true
-        activate-environment: ""
         environment-file: environment.yml
     - name: Bash
       shell: bash -l {0}
