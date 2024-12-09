@@ -1,6 +1,5 @@
 channels:
 - conda-forge
-- default
 dependencies:
   - boa
   - conda-build
