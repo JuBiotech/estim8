@@ -24,13 +24,13 @@ jobs:
     - name: Run tests
       shell: bash -l {0}
       run: |
-        pytest -v --cov=estim8 --cov-report xml --covreport term-missing estim8
+        pytest -v --cov=estim8 --cov-report xml --cov-report term-missing estim8
 
     - name: Upload coverage
       uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
-        
+
     - name: Test Wheel build, install and import
       run: |
         python setup.py bdist_wheel
