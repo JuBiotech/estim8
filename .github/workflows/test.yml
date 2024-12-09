@@ -17,7 +17,8 @@ jobs:
       uses: conda-incubator/setup-miniconda@v3
       with:
         python-version: '3.10'
-        activate-environment: testim8
+        auto-activate-base: true
+        activate-environment: ""
         environment-file: environment.yml
     - name: Bash
       shell: bash -l {0}
@@ -25,7 +26,6 @@ jobs:
         conda info
     - name: Run tests
       run: |
-        conda activate testim8
         pytest -v --cov=estim8 --cov-report xml --covreport term-missing estim8
     - name: Upload coverage
       uses: codecov/codecov-action@v4
