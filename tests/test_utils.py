@@ -68,10 +68,10 @@ class TestEstimatorHelpers:
     
     @pytest.mark.parametrize("replicate_IDs", [[None], ["1st", "2nd"]])
     def test_make_tensor_function(self, replicate_IDs):
-        f = lambda x: x**2
+        f = lambda x: x
         sub_functions = [f for _ in replicate_IDs]
         func = EstimatorHelpers.make_tensor_function(sub_functions, replicate_IDs=replicate_IDs)
-        inputs = [[1] * len(replicate_IDs)]
-        func(*inputs)
+        inputs = np.ones((len(replicate_IDs), 1))   
+        np.testing.assert_almost_equal(func(*inputs), len(replicate_IDs))
 
 
