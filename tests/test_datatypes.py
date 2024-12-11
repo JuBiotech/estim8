@@ -19,7 +19,8 @@ from estim8.error_models import LinearErrorModel
 def sample_data():
     timepoints = np.array([0, 1, 2, 3, 4])
     values = np.array([1.0, 1.2, 0.8, 1.1, 0.9])
-    return timepoints, values
+    errors = np.ones_like(values) * 0.1
+    return timepoints, values, errors
 
 
 class TestTimeSeries:
@@ -54,16 +55,15 @@ class TestMeasurement:
 
     @pytest.mark.parametrize("metric", get_args(Constants.VALID_METRICS))
     def test_get_loss(self, sample_data, metric):
-        timepoints, values = sample_data
-        measurement = Measurement("test", timepoints, values)
+        timepoints, values, errors = sample_data
+        measurement = Measurement("test", timepoints, values, errors=errors)
         prediction = ModelPrediction("test", timepoints, values)
-
         loss = measurement.get_loss(prediction, metric=metric)
         assert isinstance(loss, float)
 
     def test_get_sampling(self, sample_data):
-        timepoints, values = sample_data
-        measurement = Measurement("test", timepoints, values)
+        timepoints, values, errors = sample_data
+        measurement = Measurement("test", timepoints, values, errors=errors)
         samples = measurement.get_sampling(n_samples=5)
         assert len(samples) == 5
         assert all(isinstance(s, Measurement) for s in samples)
