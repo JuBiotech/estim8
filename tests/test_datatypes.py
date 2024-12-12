@@ -25,7 +25,7 @@ def sample_data():
 
 class TestTimeSeries:
     def test_init(self, sample_data):
-        timepoints, values = sample_data
+        timepoints, values, _ = sample_data
         ts = TimeSeries("test", timepoints, values)
         assert ts.name == "test"
         assert np.array_equal(ts.timepoints, timepoints)
@@ -33,7 +33,7 @@ class TestTimeSeries:
         assert ts.replicate_ID == Constants.SINGLE_ID
 
     def test_equal_shapes(self, sample_data):
-        timepoints, values = sample_data
+        timepoints, values, _ = sample_data
         with pytest.raises(ValueError):
             TimeSeries("test", timepoints, values[:-1])
 
@@ -47,7 +47,7 @@ class TestTimeSeries:
 
 class TestMeasurement:
     def test_init(self, sample_data):
-        timepoints, values = sample_data
+        timepoints, values, errors = sample_data
         errors = np.ones_like(values) * 0.1
         measurement = Measurement("test", timepoints, values, errors=errors)
         assert np.array_equal(measurement.errors, errors)
