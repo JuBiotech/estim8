@@ -522,12 +522,15 @@ class Estimator:
             try:
                 # extract kwargs for worker launch
                 n_workers = kwargs.pop("federated_workers")
+                worker_kwargs = kwargs.pop("worker_kwargs", {})
                 mc_sampling = kwargs.pop("mc_sampling", None)
                 # launch workers:
                 if not hasattr(self, "hosts_and_ports"):
                     # init worker logging
                     init_logging()
-                    self.launch_workers(n_workers, mc_sampling=mc_sampling)
+                    self.launch_workers(
+                        n_workers, mc_sampling=mc_sampling, **worker_kwargs
+                    )
                 # test worker responsiveness
                 self.test_workers()
                 result = func(self, *args, **kwargs)
@@ -581,6 +584,7 @@ class Estimator:
         optimizer_kwargs: dict = {},
         n_jobs: int = 1,
         federated_workers: int | bool = False,
+        worker_kwargs: dict = {},
     ):
         """Estimate the parameters of the model.
 
@@ -596,6 +600,9 @@ class Estimator:
             The number of parallel jobs, by default 1.
         federated_workers : int | bool, optional
             The number of federated workers, by default False.
+        worker_kwargs : dict, optional
+            Additional keyword arguments for federated workers. These are passed to the
+            :meth:`launch_workers` method (see :meth:`launch_workers` for details), by default {}.
 
         Returns
         -------
@@ -623,6 +630,7 @@ class Estimator:
                     method=method,
                     optimizer_kwargs=optimizer_kwargs,
                     federated_workers=federated_workers,
+                    worker_kwargs=worker_kwargs,
                 )
         else:
             return self._estimate(method=method, optimizer_kwargs=optimizer_kwargs)
@@ -722,6 +730,7 @@ class Estimator:
         n_points: int = 3,
         dp_rel: float = 0.1,
         p_inv: list = None,
+        worker_kwargs: dict = {},
     ):
         """Calculate the profile likelihood for the estimated parameters.
 
@@ -747,6 +756,9 @@ class Estimator:
             The relative parameter variation width, by default 0.1.
         p_inv : list, optional
             The parameters to investigate, by default None.
+        worker_kwargs : dict, optional
+            Additional keyword arguments for federated workers. These are passed to the
+            :meth:`launch_workers` method (see :meth:`launch_workers` for details), by default {}.
 
         Returns
         -------
@@ -797,6 +809,7 @@ class Estimator:
                 n_points=n_points,
                 dp_rel=dp_rel,
                 p_inv=p_inv,
+                worker_kwargs=worker_kwargs,
             )
 
         else:
@@ -931,6 +944,7 @@ class Estimator:
         optimizer_kwargs: dict = {},
         n_samples: int = 100,
         mcs_at_once: int = 1,
+        worker_kwargs: dict = {},
     ):
         """Perform Monte Carlo sampling for parameter estimation problem.
 
@@ -950,6 +964,9 @@ class Estimator:
             The number of Monte Carlo samples, by default 100.
         mcs_at_once : int, optional
             The number of Monte Carlo samples to process at once, by default 1.
+        worker_kwargs : dict, optional
+            Additional keyword arguments for federated workers. These are passed to the
+            :meth:`launch_workers` method (see :meth:`launch_workers` for details), by default {}.
 
         Returns
         -------
@@ -975,6 +992,7 @@ class Estimator:
                 mc_sampling=True,
                 n_samples=n_samples,
                 mcs_at_once=mcs_at_once,
+                worker_kwargs=worker_kwargs,
             )
         else:
             self.func = partial(
