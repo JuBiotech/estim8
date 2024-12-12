@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict, List, get_args
 
 import numpy as np
@@ -83,59 +84,59 @@ def all_almost_equal(estimates: Dict[str, float], true_parameters) -> bool:
 
 
 class TestEstimatorSingleReplicate:
+    @pytest.fixture(autouse=True)
+    def init_estimator(self, estimator_single_replicate: Estimator) -> None:
+        self.estimator = estimator_single_replicate
+
     @pytest.mark.parametrize("metric", get_args(Constants.VALID_METRICS))
-    def test_estimate_single_core(
-        self, estimator_single_replicate: Estimator, metric: Constants.VALID_METRICS
-    ) -> None:
-        estimator_single_replicate.metric = metric
+    def test_estimate_single_core(self, metric: Constants.VALID_METRICS) -> None:
+        self.estimator.metric = metric
         res, _ = estimator_single_replicate.estimate(
             method="de", max_iter=100, n_jobs=1
         )
-        assert all_almost_equal(res, estimator_single_replicate.model.parameters)
+        assert all_almost_equal(res, self.estimator.model.parameters)
 
-    def test_estimate_parallel(self, estimator_single_replicate: Estimator) -> None:
-        res, info = estimator_single_replicate.estimate(
-            method="de", max_iter=100, n_jobs=2
+    def test_estimate_parallel(self) -> None:
+        res, _ = self.estimator.estimate(method="de", max_iter=100, n_jobs=2)
+        assert all_almost_equal(res, self.estimator.model.parameters)
+
+    def test_estimate_federated(self) -> None:
+        """Test parameter estimation using federated workers"""
+        res, _ = self.estimator.estimate(
+            method="de", max_iter=100, n_jobs=1, federated_workers=2
         )
-        assert all_almost_equal(res, estimator_single_replicate.model.parameters)
-
-    # def test_estimate_federated(self, estimator_single_replicate: Estimator) -> None:
-    #     """Test parameter estimation using federated workers"""
-    #     res, _ = estimator_single_replicate.estimate(
-    #         method="de", max_iter=100, n_jobs=1, federated_workers=2
-    #     )
-    #     assert all_almost_equal(res, estimator_single_replicate.model.parameters)
+        assert all_almost_equal(res, self.estimator.model.parameters)
 
 
 class TestEstimatorMultiReplicates:
-    def test_estimate_single_core(
-        self, estimator_multiple_replicates: Estimator
-    ) -> None:
-        res, _ = estimator_multiple_replicates.estimate(
-            method="de", max_iter=100, n_jobs=1
-        )
-        assert all_almost_equal(res, estimator_multiple_replicates.model.parameters)
+    @pytest.fixture(autouse=True)
+    def init_estimator(self, estimator_multiple_replicates: Estimator) -> None:
+        self.estimator = estimator_multiple_replicates
 
-    def test_estimate_parallel(self, estimator_multiple_replicates: Estimator) -> None:
-        res, _ = estimator_multiple_replicates.estimate(
-            method="de", max_iter=100, n_jobs=2
-        )
-        assert all_almost_equal(res, estimator_multiple_replicates.model.parameters)
+    def test_estimate_single_core(self) -> None:
+        res, _ = self.estimator.estimate(method="de", max_iter=100, n_jobs=1)
+        assert all_almost_equal(res, self.estimator.model.parameters)
 
-    def test_estimate_federated(self, estimator_multiple_replicates: Estimator) -> None:
+    def test_estimate_parallel(self) -> None:
+        res, _ = self.estimator.estimate(method="de", max_iter=100, n_jobs=2)
+        assert all_almost_equal(res, self.estimator.model.parameters)
+
+    def test_estimate_federated(self) -> None:
         """Test parameter estimation with multiple replicates using federated workers"""
-        res, _ = estimator_multiple_replicates.estimate(
+        res, _ = self.estimator.estimate(
             method="de", max_iter=100, n_jobs=1, federated_workers=2
         )
-        assert all_almost_equal(res, estimator_multiple_replicates.model.parameters)
+        assert all_almost_equal(res, self.estimator.model.parameters)
 
 
 class TestMonteCarlo:
-    def test_mc_sampling_single_core(
-        self, estimator_single_replicate: Estimator
-    ) -> None:
+    @pytest.fixture(autouse=True)
+    def init_estimator(self, estimator_single_replicate: Estimator) -> None:
+        self.estimator = estimator_single_replicate
+
+    def test_mc_sampling_single_core(self) -> None:
         """Test Monte Carlo sampling with single core"""
-        results = estimator_single_replicate.mc_sampling(
+        results = self.estimator.mc_sampling(
             method="de", n_jobs=1, max_iter=50, n_samples=2, mcs_at_once=1
         )
 
@@ -143,12 +144,12 @@ class TestMonteCarlo:
         for res, info in results:
             assert isinstance(res, dict)
             assert isinstance(info, dict)
-            assert all(param in res for param in estimator_single_replicate.bounds)
+            assert all(param in res for param in self.estimator.bounds)
             assert "fun" in info
 
-    def test_mc_sampling_parallel(self, estimator_single_replicate: Estimator) -> None:
+    def test_mc_sampling_parallel(self) -> None:
         """Test Monte Carlo sampling with parallel processing"""
-        results = estimator_single_replicate.mc_sampling(
+        results = self.estimator.mc_sampling(
             method="de", n_jobs=1, max_iter=50, n_samples=2, mcs_at_once=2
         )
 
@@ -156,12 +157,12 @@ class TestMonteCarlo:
         for res, info in results:
             assert isinstance(res, dict)
             assert isinstance(info, dict)
-            assert all(param in res for param in estimator_single_replicate.bounds)
+            assert all(param in res for param in self.estimator.bounds)
             assert "fun" in info
 
-    def test_mc_sampling_federated(self, estimator_single_replicate: Estimator) -> None:
+    def test_mc_sampling_federated(self) -> None:
         """Test Monte Carlo sampling with federated workers"""
-        results = estimator_single_replicate.mc_sampling(
+        results = self.estimator.mc_sampling(
             method="de",
             n_jobs=1,
             max_iter=50,
@@ -174,23 +175,23 @@ class TestMonteCarlo:
         for res, info in results:
             assert isinstance(res, dict)
             assert isinstance(info, dict)
-            assert all(param in res for param in estimator_single_replicate.bounds)
+            assert all(param in res for param in self.estimator.bounds)
             assert "fun" in info
 
 
 class TestProfileLikelihood:
-    def test_profile_likelihood_single_core(
-        self, estimator_single_replicate: Estimator
-    ) -> None:
-        """Test profile likelihood calculation with single core"""
-        estimator = estimator_single_replicate
-        estimator.metric = "negLL"  # Profile likelihood requires negLL metric
+    @pytest.fixture(autouse=True)
+    def init_estimator(self, estimator_single_replicate: Estimator) -> None:
+        self.estimator = estimator_single_replicate
+        self.estimator.metric = "negLL"  # Profile likelihood requires negLL metric
 
+    def test_profile_likelihood_single_core(self) -> None:
+        """Test profile likelihood calculation with single core"""
         # First get optimal parameters
-        p_opt, _ = estimator.estimate(method="de", max_iter=50, n_jobs=1)
+        p_opt, _ = self.estimator.estimate(method="de", max_iter=50, n_jobs=1)
 
         # Calculate profile likelihood
-        results = estimator.profile_likelihood(
+        results = self.estimator.profile_likelihood(
             p_opt=p_opt,
             method="de",
             max_iter=50,
@@ -207,16 +208,11 @@ class TestProfileLikelihood:
             assert "value" in point
             assert "loss" in point
 
-    def test_profile_likelihood_parallel(
-        self, estimator_single_replicate: Estimator
-    ) -> None:
+    def test_profile_likelihood_parallel(self) -> None:
         """Test profile likelihood calculation with parallel processing"""
-        estimator = estimator_single_replicate
-        estimator.metric = "negLL"
+        p_opt, _ = self.estimator.estimate(method="de", max_iter=50, n_jobs=1)
 
-        p_opt, _ = estimator.estimate(method="de", max_iter=50, n_jobs=1)
-
-        results = estimator.profile_likelihood(
+        results = self.estimator.profile_likelihood(
             p_opt=p_opt,
             method="de",
             max_iter=50,
@@ -233,16 +229,11 @@ class TestProfileLikelihood:
             assert param in results
             assert len(results[param]) == 3
 
-    def test_profile_likelihood_federated(
-        self, estimator_single_replicate: Estimator
-    ) -> None:
+    def test_profile_likelihood_federated(self) -> None:
         """Test profile likelihood calculation with federated workers"""
-        estimator = estimator_single_replicate
-        estimator.metric = "negLL"
+        p_opt, _ = self.estimator.estimate(method="de", max_iter=50, n_jobs=1)
 
-        p_opt, _ = estimator.estimate(method="de", max_iter=50, n_jobs=1)
-
-        results = estimator.profile_likelihood(
+        results = self.estimator.profile_likelihood(
             p_opt=p_opt,
             method="de",
             max_iter=50,
@@ -256,18 +247,13 @@ class TestProfileLikelihood:
         assert "offset" in results
         assert len(results["offset"]) == 3
 
-    def test_profile_likelihood_invalid_inputs(
-        self, estimator_single_replicate: Estimator
-    ) -> None:
+    def test_profile_likelihood_invalid_inputs(self) -> None:
         """Test profile likelihood with invalid inputs"""
-        estimator = estimator_single_replicate
-        estimator.metric = "negLL"
-
-        p_opt, _ = estimator.estimate(method="de", max_iter=50, n_jobs=1)
+        p_opt, _ = self.estimator.estimate(method="de", max_iter=50, n_jobs=1)
 
         # Test invalid dp_rel
         with pytest.raises(ValueError):
-            estimator.profile_likelihood(
+            self.estimator.profile_likelihood(
                 p_opt=p_opt,
                 method="de",
                 max_iter=50,
@@ -276,13 +262,13 @@ class TestProfileLikelihood:
 
         # Test invalid parameter name
         with pytest.raises(KeyError):
-            estimator.profile_likelihood(
+            self.estimator.profile_likelihood(
                 p_opt=p_opt, method="de", max_iter=50, p_inv=["invalid_param"]
             )
 
         # Test invalid p_opt
         with pytest.raises(KeyError):
-            estimator.profile_likelihood(
+            self.estimator.profile_likelihood(
                 p_opt={"invalid_param": 1.0}, method="de", max_iter=50
             )
 
