@@ -91,9 +91,7 @@ class TestEstimatorSingleReplicate:
     @pytest.mark.parametrize("metric", get_args(Constants.VALID_METRICS))
     def test_estimate_single_core(self, metric: Constants.VALID_METRICS) -> None:
         self.estimator.metric = metric
-        res, _ = estimator_single_replicate.estimate(
-            method="de", max_iter=100, n_jobs=1
-        )
+        res, _ = self.estimator.estimate(method="de", max_iter=100, n_jobs=1)
         assert all_almost_equal(res, self.estimator.model.parameters)
 
     def test_estimate_parallel(self) -> None:
