@@ -69,7 +69,7 @@ class TestMeasurement:
         assert all(isinstance(s, Measurement) for s in samples)
 
     def test_getLoss_wrongMetric(self, sample_data):
-        timepoints, values = sample_data
+        timepoints, values, errors = sample_data
         measurement = Measurement("test", timepoints, values)
         prediction = ModelPrediction("test", timepoints, values)
         with pytest.raises(NotImplementedError):
@@ -84,7 +84,7 @@ class TestExperiment:
         assert all(isinstance(m, Measurement) for m in exp.measurements)
 
     def test_init_with_measurements(self, sample_data):
-        timepoints, values = sample_data
+        timepoints, values, errors = sample_data
         measurements = [
             Measurement("m1", timepoints, values),
             Measurement("m2", timepoints, values),
@@ -93,7 +93,7 @@ class TestExperiment:
         assert len(exp.measurements) == 2
 
     def test_getitem(self, sample_data):
-        timepoints, values = sample_data
+        timepoints, values, errors = sample_data
         measurements = [
             Measurement("m1", timepoints, values),
             Measurement("m2", timepoints, values),
@@ -104,15 +104,22 @@ class TestExperiment:
             exp["nonexistent"]
 
     def test_generate_mc_samples(self, sample_data):
-        timepoints, values = sample_data
-        measurements = [Measurement("m1", timepoints, values)]
+        timepoints, values, errors = sample_data
+        measurements = [
+            Measurement(
+                "m1",
+                timepoints,
+                values,
+                error_model=LinearErrorModel(slope=0.1, offset=0.1),
+            )
+        ]
         exp = Experiment(measurements)
         samples = exp.generate_mc_samples(n_samples=3)
         assert len(samples) == 3
         assert all(isinstance(s, Experiment) for s in samples)
 
     def test_unequalDFshapes(self, sample_data):
-        timepoints, values = sample_data
+        timepoints, values, errors = sample_data
         df = pd.DataFrame({"A": [1, 2, 3], "B": [4, 5, 6]}, index=[0, 1, 2])
 
         errors = pd.DataFrame({"A": [1, 2], "B": [4, 5]}, index=[0, 1])
