@@ -4,7 +4,7 @@ Examples
 .. nbgallery::
     :caption: Examples
     :name: example_gallery
-    
+
    01_Example_Simulation
    02_Example_Estimation
    03_Example_Error_modeling
