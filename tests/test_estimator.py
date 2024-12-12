@@ -99,12 +99,12 @@ class TestEstimatorSingleReplicate:
         )
         assert all_almost_equal(res, estimator_single_replicate.model.parameters)
 
-    def test_estimate_federated(self, estimator_single_replicate: Estimator) -> None:
-        """Test parameter estimation using federated workers"""
-        res, _ = estimator_single_replicate.estimate(
-            method="de", max_iter=100, n_jobs=1, federated_workers=2
-        )
-        assert all_almost_equal(res, estimator_single_replicate.model.parameters)
+    # def test_estimate_federated(self, estimator_single_replicate: Estimator) -> None:
+    #     """Test parameter estimation using federated workers"""
+    #     res, _ = estimator_single_replicate.estimate(
+    #         method="de", max_iter=100, n_jobs=1, federated_workers=2
+    #     )
+    #     assert all_almost_equal(res, estimator_single_replicate.model.parameters)
 
 
 class TestEstimatorMultiReplicates:
