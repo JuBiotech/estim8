@@ -42,9 +42,7 @@ def test_simulate(dummy_model):
 
 
 class TestFmuModel:
-    test_fmu_path = (
-        Path(__file__).absolute().parent.parent / "tests/test_data/growth.fmu"
-    )
+    test_fmu_path = "tests/test_data/growth.fmu"
 
     def test_retrieve_variables(self):
         fmu_model = FmuModel(self.test_fmu_path)
