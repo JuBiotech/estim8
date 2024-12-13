@@ -21,6 +21,17 @@ jobs:
         environment-file: environment.yml
         auto-activate-base: false
 
+    - name: setup OpenModelica compiler
+      uses: OpenModelica/setup-openmodelica@v1.0
+      with:
+        packages: |
+          omc
+
+    - name: compile FMU
+      shell: bash -l {0}
+      run: |
+      cp $(python tests/test_data/model_compilation.py --modelname SimpleBatch) tests/test_data
+
     - name: Run tests
       shell: bash -l {0}
       run: |
