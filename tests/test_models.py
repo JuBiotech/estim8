@@ -41,39 +41,39 @@ def test_simulate(dummy_model):
     assert checObsInSim("obs2", sim)
 
 
-# class TestFmuModel:
-#     test_fmu_path = (
-#         Path(__file__).absolute().parent.parent / "tests/test_data/growth.fmu"
-#     )
+class TestFmuModel:
+    test_fmu_path = (
+        Path(__file__).absolute().parent.parent / "tests/test_data/growth.fmu"
+    )
 
-#     def test_retrieve_variables(self):
-#         fmu_model = FmuModel(self.test_fmu_path)
-#         assert "X" in fmu_model.observables
-#         assert all([param in fmu_model.parameters for param in ["X0", "mu_max"]])
-#         del fmu_model
+    def test_retrieve_variables(self):
+        fmu_model = FmuModel(self.test_fmu_path)
+        assert "X" in fmu_model.observables
+        assert all([param in fmu_model.parameters for param in ["X0", "mu_max"]])
+        del fmu_model
 
-#     @pytest.mark.parametrize("fmi_type", ["ModelExchange", "CoSimulation", "Error"])
-#     def test_FMI_setter_and_instantiateFMU(self, fmi_type):
-#         fmu_model = FmuModel(self.test_fmu_path)
-#         if fmi_type in ["ModelExchange", "CoSimulation"]:
-#             fmu_model.fmi_type = fmi_type
-#             assert fmu_model.fmi_type == fmi_type
-#         else:
-#             with pytest.raises(ValueError):
-#                 fmu_model.fmi_type = fmi_type
-#         del fmu_model
+    @pytest.mark.parametrize("fmi_type", ["ModelExchange", "CoSimulation", "Error"])
+    def test_FMI_setter_and_instantiateFMU(self, fmi_type):
+        fmu_model = FmuModel(self.test_fmu_path)
+        if fmi_type in ["ModelExchange", "CoSimulation"]:
+            fmu_model.fmi_type = fmi_type
+            assert fmu_model.fmi_type == fmi_type
+        else:
+            with pytest.raises(ValueError):
+                fmu_model.fmi_type = fmi_type
+        del fmu_model
 
-#     @pytest.mark.parametrize("fmi_type", ["ModelExchange", "CoSimulation"])
-#     def test_simulation(self, fmi_type):
-#         fmu_model = FmuModel(self.test_fmu_path)
-#         fmu_model.fmi_type = fmi_type
-#         assert fmu_model.fmi_type == fmi_type
-#         print(fmu_model.observables)
-#         sim = fmu_model.simulate(0, 10, 1)
-#         assert isinstance(sim, Simulation)
-#         assert checObsInSim("X", sim)
-#         del fmu_model
+    @pytest.mark.parametrize("fmi_type", ["ModelExchange", "CoSimulation"])
+    def test_simulation(self, fmi_type):
+        fmu_model = FmuModel(self.test_fmu_path)
+        fmu_model.fmi_type = fmi_type
+        assert fmu_model.fmi_type == fmi_type
+        print(fmu_model.observables)
+        sim = fmu_model.simulate(0, 10, 1)
+        assert isinstance(sim, Simulation)
+        assert checObsInSim("X", sim)
+        del fmu_model
 
-#     def test_pickle(self):
-#         fmu_model = FmuModel(self.test_fmu_path)
-#         pickle.dumps(fmu_model)
+    def test_pickle(self):
+        fmu_model = FmuModel(self.test_fmu_path)
+        pickle.dumps(fmu_model)
