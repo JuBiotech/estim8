@@ -30,7 +30,7 @@ jobs:
     - name: compile FMU
       shell: bash -l {0}
       run: |
-        echo python tests/test_data/model_compilation.py --modelname Growth
+        python tests/test_data/model_compilation.py --modelname Growth
 
     - name: Run tests
       shell: bash -l {0}
