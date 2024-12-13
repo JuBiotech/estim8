@@ -30,11 +30,7 @@ jobs:
     - name: compile FMU
       shell: bash -l {0}
       run: |
-        echo python tests/test_data/model_compilation.py --modelname growth
-
-    - name: List files in test_data directory
-      run: |
-        ls -la tests/test_data
+        echo python tests/test_data/model_compilation.py --modelname Growth
 
     - name: Run tests
       shell: bash -l {0}
