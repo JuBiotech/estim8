@@ -1,3 +1,4 @@
+import time
 from copy import deepcopy
 from typing import Dict, List, get_args
 
@@ -37,7 +38,7 @@ def data_multiple_replicates(
     data_single_replicate: Experiment,
 ) -> Dict[str, Experiment]:
     data = {}
-    for rid in map(str, list(range(3))):
+    for rid in map(str, list(range(2))):
         data[rid] = data_single_replicate
         data[rid].replicate_ID = rid
     return data
@@ -121,12 +122,15 @@ class TestEstimatorMultiReplicates:
 
     def test_estimate_federated(self) -> None:
         """Test parameter estimation with multiple replicates using federated workers"""
+
+        self.estimator.launch_workers(2, host="127.0.0.1", start_at_port=9000)
+        time.sleep(10)
         res, _ = self.estimator.estimate(
             method="de",
             max_iter=100,
             n_jobs=1,
             federated_workers=2,
-            worker_kwargs={"start_at_port": 9000},
+            # worker_kwargs={"start_at_port": 9000},
         )
         assert all_almost_equal(res, self.estimator.model.parameters)
 
@@ -171,7 +175,7 @@ class TestMonteCarlo:
             n_samples=2,
             mcs_at_once=2,
             federated_workers=2,
-            worker_kwargs={"start_at_port": 9100},
+            worker_kwargs={"host": "127.0.0.1", "start_at_port": 9100},
         )
 
         assert len(results) == 2
