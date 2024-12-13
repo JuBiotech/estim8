@@ -22,3 +22,6 @@ dependencies:
     - pytest
     - pytest-cov
   # - m2w64-toolchain  # [win]
+  # for building
+    - twine
+    - wheel
