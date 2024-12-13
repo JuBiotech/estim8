@@ -34,6 +34,7 @@ jobs:
         file: ./coverage.xml
 
     - name: Test Wheel build, install and import
+      shell: bash -l {0}
       run: |
         python setup.py bdist_wheel
         twine check dist/*
