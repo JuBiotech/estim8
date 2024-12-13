@@ -30,7 +30,7 @@ jobs:
     - name: compile FMU
       shell: bash -l {0}
       run: |
-      cp $(python tests/test_data/model_compilation.py --modelname SimpleBatch) tests/test_data
+        cp $(python tests/test_data/model_compilation.py --modelname SimpleBatch) tests/test_data
 
     - name: Run tests
       shell: bash -l {0}
