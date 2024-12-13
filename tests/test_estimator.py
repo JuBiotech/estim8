@@ -248,7 +248,7 @@ class TestProfileLikelihood:
             n_points=3,
             dp_rel=0.1,
             p_inv=["offset"],
-            worker_kwargs={"start_at_port": 9300},
+            worker_kwargs={"host": "127.0.0.1", "start_at_port": 9300},
         )
 
         assert isinstance(results, dict)
