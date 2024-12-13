@@ -24,8 +24,11 @@ jobs:
     - name: setup OpenModelica compiler
       uses: OpenModelica/setup-openmodelica@v1.0
       with:
+        version: 'stable'
         packages: |
           omc
+        libraries: |
+          'Modelica 4.0.0'
 
     - name: compile FMU
       shell: bash -l {0}
