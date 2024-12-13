@@ -8,7 +8,6 @@ from warnings import warn
 
 import joblib
 import numpy as np
-import pygmo
 import scipy.optimize
 import skopt
 
@@ -281,7 +280,7 @@ class Optimization:
         algos_kwargs: List[dict],
         n_processes: int = joblib.cpu_count(),
         pop_size=50,
-        topology=pygmo.unconnected(),
+        topology=generalized_islands.pygmo.unconnected(),
         n_evos: int = 10,
         iterations=1,
         report_level: int = 1,
@@ -375,7 +374,7 @@ class Optimization:
             return estimates, estimation_info
 
         else:
-            pygmo.mp_island.shutdown_pool()
+            generalized_islands.pygmo.mp_island.shutdown_pool()
 
             return Optimization.optimize_pygmo_archipelago_continued(
                 estimation_info, n_evos, iterations - 1

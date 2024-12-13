@@ -1,11 +1,88 @@
-"""This module implements helper functions for working with pygmo`s generalized islands approach.
-"""
+"""This module implements helper functions for working with pygmo`s generalized islands approach."""
 
-from typing import Any, Dict, List, Tuple
+import importlib
+from typing import Any, Dict, List, Protocol, Tuple, runtime_checkable
+from warnings import warn
 
 import joblib
 import numpy as np
-import pygmo
+
+
+# Define protocol classes for type checking
+@runtime_checkable
+class PygmoArchipelago(Protocol):
+    def get_champions_f(self) -> List[float]:
+        ...
+
+    def get_champions_x(self) -> List[List[float]]:
+        ...
+
+    def wait_check(self) -> None:
+        ...
+
+    def __getitem__(self, key: int) -> Any:
+        ...
+
+    def push_back(self, **kwargs) -> None:
+        ...
+
+    def set_migrant_handling(self, handler: Any) -> None:
+        ...
+
+
+@runtime_checkable
+class PygmoIsland(Protocol):
+    def extract(self, cls: Any) -> Any:
+        ...
+
+    def get_population(self) -> Any:
+        ...
+
+
+@runtime_checkable
+class PygmoProblem(Protocol):
+    def extract(self, cls: Any) -> Any:
+        ...
+
+    def get_fevals(self) -> int:
+        ...
+
+
+def optional_import(module_name, mock_name=None):
+    try:
+        return importlib.import_module(module_name)
+    except ImportError:
+        if mock_name:
+            return importlib.import_module(mock_name)
+        else:
+
+            class MockArchipelago:
+                def __getattr__(self, name):
+                    warn(
+                        f"Module {module_name} is not installed. In order to use this function try:\n conda install -c conda-forge pygmo"
+                    )
+                    return None
+
+            class MockModule:
+                def __init__(self):
+                    self.archipelago = MockArchipelago
+                    self.algorithm = MockArchipelago
+                    self.problem = MockArchipelago
+                    self.mp_island = MockArchipelago
+                    self.topology = MockArchipelago
+                    self.migrant_handling = MockArchipelago
+                    self.fully_connected = lambda: None
+
+                def __getattr__(self, name):
+                    warn(
+                        f"Module {module_name} is not installed. In order to use this function try:\n conda install -c conda-forge pygmo"
+                    )
+                    return lambda *args, **kwargs: None
+
+            return MockModule()
+
+
+pygmo = optional_import("pygmo")
 
 from .objective import Objective
 
@@ -71,13 +148,14 @@ class UDproblem:
 class PygmoEstimationInfo:
     """An object to store additional information from an evolved archipelago as well as the archipelago itself."""
 
-    def __init__(self, archi: pygmo.archipelago, loss: float = np.inf, n_evos: int = 0):
+    def __init__(self, archi: PygmoArchipelago, loss: float = np.inf, n_evos: int = 0):
         """
         Initialize the PygmoEstimationInfo class.
 
         Parameters
         ----------
-        archi : pygmo.archipelago
+
+        archi : PygmoArchipelago
             The archipelago.
         loss : float, optional
             Best loss value among all champions from the evolved archipelago, by default np.inf.
@@ -145,7 +223,7 @@ class PygmoHelpers:
     }
 
     @staticmethod
-    def get_pygmo_algorithm_instance(name: str, kwargs: dict = None) -> pygmo.algorithm:
+    def get_pygmo_algorithm_instance(name: str, kwargs: dict = None) -> Any:
         """Creates an instance of a pygmo.algorithm given the name and algorithm kwargs.
 
         Parameters
@@ -210,12 +288,12 @@ class PygmoHelpers:
         return pygmo.population(problem, pop_size, seed=seed)
 
     @staticmethod
-    def resize_archi_process_pools(archi: pygmo.archipelago, n_processes: int):
+    def resize_archi_process_pools(archi: PygmoArchipelago, n_processes: int):
         """Resize the process pools of the archipelago.
 
         Parameters
         ----------
-        archi : pygmo.archipelago
+        archi : PygmoArchipelago
             The archipelago.
         n_processes : int
             The number of processes.
@@ -232,10 +310,10 @@ class PygmoHelpers:
         algos: List[str],
         algos_kwargs: List[dict],
         pop_size: int,
-        topology: pygmo.topology = pygmo.fully_connected(),
+        topology: Any = pygmo.fully_connected(),
         report=False,
         n_processes=joblib.cpu_count(),
-    ) -> pygmo.archipelago:
+    ) -> PygmoArchipelago:
         """Creates a pygmo.archipelago object using the generalized islands model.
 
         Parameters
@@ -298,12 +376,12 @@ class PygmoHelpers:
         return archi
 
     @staticmethod
-    def extract_archipelago_problem(archi: pygmo.archipelago, i=0) -> pygmo.problem:
+    def extract_archipelago_problem(archi: PygmoArchipelago, i=0) -> PygmoProblem:
         """Extracts the user defined problem from an archipelago, implemented as pygmo.problem(UDproblem).
 
         Parameters
         ----------
-        archi : pygmo.archipelago
+        archi : PygmoArchipelago
             The evolved archipelago.
         i : int, optional
             Index of the island from which the problem is extracted, by default 0.
@@ -316,12 +394,12 @@ class PygmoHelpers:
         return archi[i].get_population().problem
 
     @staticmethod
-    def get_estimates_from_archipelago(archi: pygmo.archipelago) -> Tuple[dict, float]:
+    def get_estimates_from_archipelago(archi: PygmoArchipelago) -> Tuple[dict, float]:
         """Extracts the best estimates and corresponding value of the objective function from an archipelago object.
 
         Parameters
         ----------
-        archi : pygmo.archipelago
+        archi : PygmoArchipelago
             The evolved archipelago.
 
         Returns
@@ -345,13 +423,13 @@ class PygmoHelpers:
 
     @staticmethod
     def get_archipelago_results(
-        archi: pygmo.archipelago, estimation_info: PygmoEstimationInfo
+        archi: PygmoArchipelago, estimation_info: PygmoEstimationInfo
     ) -> Tuple[dict, PygmoEstimationInfo]:
         """Extracts the results of an evolved archipelago and updates additional estimation info.
 
         Parameters
         ----------
-        archi : pygmo.archipelago
+        archi : PygmoArchipelago
             The evolved archipelago.
         estimation_info : PygmoEstimationInfo
             Additional information about the archipelago before evolution(s).
