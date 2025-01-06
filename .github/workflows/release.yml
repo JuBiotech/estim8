@@ -2,7 +2,7 @@ name: release-pipeline
 
 on:
   release:
-    types: [created]  
+    types: [created]
 
 jobs:
   release-job:
