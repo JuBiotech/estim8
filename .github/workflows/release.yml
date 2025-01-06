@@ -14,7 +14,7 @@ jobs:
     - name: set up python
       with:
         python-version: "3.10"
-    - nane: build package
+    - name: build package
       run: |
         pip install wheel twine
         python setup.py bdist_wheel
