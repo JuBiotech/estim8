@@ -25,4 +25,5 @@ dependencies:
   # for building
     - twine
     - wheel
+  # compiling FMU models from OMPython API
     - OMPython
