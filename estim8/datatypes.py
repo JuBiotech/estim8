@@ -1,3 +1,18 @@
+# estim8
+# Copyright (C) 2025 Forschungszentrum Jülich GmbH
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 This model defines the datatypes used to store simulated and experimental data in the `estim8` package.
 Further it implements methods for calculation of discrepancy measures or statistical likelhoods.
@@ -331,7 +346,7 @@ class Measurement(TimeSeries):
                 x=y_pred,
                 loc=self.values,
                 scale=self.errors,
-                **self.error_model.error_distribution_kwargs
+                **self.error_model.error_distribution_kwargs,
             )
 
         return np.sum(loss)

@@ -1,3 +1,18 @@
+# estim8
+# Copyright (C) 2025 Forschungszentrum Jülich GmbH
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 This module implements Workers that serve as a computaion backend for an objective function.
 Further it implements the federated Worker class and functions for launching a pool of such services.
@@ -13,12 +28,6 @@ import grpclib
 import numpy as np
 import pytensor_federated
 from numpy.core.multiarray import array as array
-
-from estim8.datatypes import Experiment, Simulation
-from estim8.models import Estim8Model
-
-from .datatypes import Experiment, Simulation
-from .models import Estim8Model
 
 
 def init_logging():
