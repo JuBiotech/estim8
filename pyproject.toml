@@ -19,7 +19,7 @@ classifiers=[
 ]
 keywords=["Biorpocessmodeling", "Parameter estimation", "Functional Mockup Interface"]
 dependencies = [
-    "numpy>=1.17.0,<2",
+    "numpy>=1.17.0,<3",
     "fmpy",
     "scikit-optimize",
     "scikit-learn==1.4.2",
