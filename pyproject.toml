@@ -22,7 +22,7 @@ dependencies = [
     "numpy>=1.17.0,<2",
     "fmpy",
     "scikit-optimize",
-    "scikit-learn==1.4.2",
+    "scikit-learn==1.6.1",
     "matplotlib",
     "seaborn",
     "pandas",
