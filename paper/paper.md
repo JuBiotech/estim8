@@ -33,7 +33,7 @@ affiliations:
    index: 3
 
 date:
-bibliography: bibliography.bib
+bibliography: literature.bib
 
 ---
 
