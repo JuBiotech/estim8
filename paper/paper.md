@@ -1,4 +1,5 @@
 ---
+
 title: 'estim8 - A python toolbox for bioprocess modeling and parameter estimation'
 tags:
   - Functional Mock-up Units
@@ -34,46 +35,52 @@ affiliations:
 date:
 bibliography:
   - references.bib
+
 ---
 
 # Summary
+Modeling and simulation are essential tools for understanding the complex nature of biological systemsy and exploiting the information contained in experimental data. We present the Python package $\texttt{estim8}, an FMI-compliant framework for ODE and DAE (bio)process modeling and parameter estimation. The source code is available on [GitHub](https://github.com/JuBiotech/estim8). The package is unit-tested on Windows and Linux. A thorough guideline is provided by various example notebooks.
 
 # Statement of Need
 Mathematical modeling has become a pivotal tool in biotechnological research [@RN29] and industrial bioprocess development [@RN27; @RN28] by parametrizing the information gained from experimental data and creating digital twins. While ordinary differential equations (ODEs) are commonly used to describe continuous biological systems, many biotechnological applications require differential algebraic equation (DAE) systems to handle discontinuities, discrete events, physical constraints, and embedded optimization criteria [@RN26].
 
-Parameter estimation is crucial in this context, as many model parameters cannot be determined a priori and must be fitted to experimental data. Although several general-purpose software tools for simulation and parameter estimation exist, they currently have significant limitations: many only support ODE systems [@RN30; @RN33; @RN34; @RN31], require substantial workarounds for biological problems [@RN35; @RN36], or depend on proprietary MATLAB licenses for DAE simulation [@RN32].
+Parameter estimation is crucial in this context, as many model parameters cannot be determined a priori and must be estimated. This is commonly addressed by "fitting" the model to experimental data. Although several general-purpose software tools for simulation and parameter estimation exist, they currently have significant limitations: Many only support ODE systems [@RN30; @RN33; @RN34; @RN31], require substantial workarounds for biological problems [@RN35; @RN36], or depend on proprietary MATLAB licenses for DAE simulation [@RN32].
 
-To address these limitations, we present $\texttt{estim8}$: a Python-based toolbox for simulation and parameter estimation of dynamic models. Built on the Functional Mock-up Interface (FMI) standard, $\texttt{estim8}$ provides specialized functionality for biotechnological applications, particularly in handling experimental replicates. By supporting model definition and simulation export from various FMI compliant third-party software, including the open-source OpenModelica platform [@RN22], $\texttt{estim8}$ enables comprehensive DAE support and convenient event handling.
+To address these limitations, we present $\texttt{estim8}$: a Python-based toolbox for simulation and parameter estimation of dynamic models. It is built on the Functional Mock-up Interface (FMI) standard and employs metaheuristic algorithms for optimization problems. $\texttt{estim8}$ provides specialized functionality for biotechnological applications, particularly in handling experimental replicates. By supporting model definition and simulation export from various FMI compliant third-party software, including the open-source OpenModelica platform [@RN22], $\texttt{estim8}$ enables comprehensive DAE support and convenient event handling.
 
 
 
 # Materials and Methods
-$\texttt{estim8}$ is an open source Python package compatible and tested with Windows and Linux/Unix platforms. It comprises 10 modules: `estimator`, `models`, `datatypes`, `error_models`, `workers`, `generalized_islands`, `objective`, `optimizers`, `utils` and `visualization`. The modular, object-oriented architecture allows for easy expansion by new implementations, like e.g. custom simulators or cost functions. At the very core, $\texttt{estim8}$ currently features interactive simulation of $\textit{Functional Mock-up Units}$ (FMUs) in Python utilizing FMPy [@RN14] via ModelExchange and CoSimulation. Parameter estimation and functionality for uncertainty quantification rely on the packages SciPy [@RN15] and pygmo [@RN21].
+$\texttt{estim8}$ is an open source Python package compatible and tested with Windows and Linux/Unix platforms. It comprises 10 modules: `estimator`, `models`, `datatypes`, `error_models`, `workers`, `generalized_islands`, `objective`, `optimizers`, `utils` and `visualization`. The modular, object-oriented architecture allows for easy expansion by new implementations, like e.g. custom simulators or cost functions. At the very core, $\texttt{estim8}$ currently features interactive simulation of Functional Mock-up Units (FMUs) via the ModelExchange or CoSimulation interface in Python utilizing FMPy [@RN14]. Parameter estimation and functionality for uncertainty quantification rely on the packages SciPy [@RN15] and pygmo [@RN21].
 
 # Results and discussion
 ## Workflow
-- mathematical modeling in 3rd party software that is part of the FMI standard
-  - e.g. OpenModelica [@RN22], which is open source and offers a interactive modeling environment with graphical
-  - model export to FMU, both CoSimulation and ModelExchange. Special solvers can be packed to fmu if needed
-  - enables DAE, events and discontinities
-- loading the fmu in estim8's `FmuModel`
-- datastructure: experiment objects, consisting of measurements, with individual error model, observation mappings
-- replicate modeling:
-    - best practice to run biological experiments in replicates to account for variability and heterogeinity, essential for enhancing the statistical quality [@RN19]
-    - differing conditions between replicates, e.g. different biomass concentrations in reactor vessels need to be accounted by the modeler.
-    - $\texttt{estim8}$ defines model replicates, which can be connected by global parameters or may have replicate specific local parameters
+The workflow in $\texttt{estim8}$ follows a structured approach to bioprocess modeling and parameter estimation (Figure 1). Users begin by developing mathematical models using third-party software that supports the FMI standard, such as OpenModelica [@RN22]. This open-source platform provides an interactive modeling environment with graphical capabilities and enables the export of models as Functional Mock-up Units (FMUs), supporting both CoSimulation and ModelExchange formats.
 
-- heart of $\texttt{estim8}$ is the `estimator` class, which stores all necessary information and manages parameter estimation tasks. Different solvers can be used for optimization tasks.
-- re-estimation based methods for parameter identifiability and uncertainty quantification by means of profile likelihoods and Monte carlo sampling.
-- a thourough set of visualization functions for analysis of simulations, compared to data and parameter estimations
+The exported FMU is then integrated into $\texttt{estim8}$ using the $\texttt{FmuModel}$ class. The package implements a structured data hierarchy where $\texttt{experiment}$ objects contain $\texttt{measurements}$, associated $\texttt{error\_models}$, and $\texttt{observation\_mapping}s$ . A key feature of $\texttt{estim8}$ is its comprehensive handling of biological replicates, which are crucial for ensuring statistical quality in biological experiments [@RN19]. The package accounts for varying conditions between replicates, such as different experimental conditions, through model replicates that can share global parameters while maintaining replicate-specific local parameters based on a user-defined $\texttt{parameter\_mapping}$.
+
+At the core of $\texttt{estim8}$ is the $\texttt{Estimator}$ class, which serves as a central hub for managing parameter estimation tasks. This class
+stores all user input data and provides the functionality for parameter estimation. Identifiability analysis and uncertainty quantification are approached through profile likelihoods and Monte Carlo sampling respectively. The `visualization` module includes comprehensive visualization methods for analyzing simulation results, comparing model predictions with experimental data, and evaluating parameter estimation outcomes. A thourough guideline is given by example notebooks in our [documentation](https://estim8.readthedocs.io/en/latest/).
+
+![](./docs/source/images/estim8_workflow.svg){width="100%"}
+__Figure 1__: Schematic overview of the $\texttt{estim8}$ workflow.
 
 
-## Architecture and Scalability
-A set of the population-based solvers enable parallel evaluations of cost functions, especially the pygmo allows fo highly parallelizable setups. With respect to the costly evaluation of expperimental replicates, $\texttt{estim8}$ introduces a second layer of parallelization of model replicate simulations. This setup utilizes a federated computing principle using
+## Scalability
 
-# Conclusions
+Parameter estimation requires numerous simulation steps for evaluating a candidate solution $\theta$ by comparing the resulting model predictions to experimental data based on a statistical likelihood measure $\mathcal{L}$. This evaluation procedure – commonly refered to as the _objective function_ – in most application cases is the time-determining step for total estimation time.
+Many population-based solvers therefore enable parallel evaluations of the objective function, especially the pygmo package allows fo highly parallelizable setups.
+
+Integrating experimental replicates however dramatically increases the number of simulations, as the objective function for a global parameter set $\theta_{global}$ is now a differentiable function given by the sum of replicate specific likelihood measures:
+$$
+\mathcal{L}(\theta_{global}|y_{global}) = \sum_{i=1}^{n}{\mathcal{L}(\theta_{local_{i}}|y_{local_i})}
+$$
+
+For this matter, $\texttt{estim8}$ employs a so-called federated computing setup (Figure 2), which effectively introduces an addtional parallelization layer. Using pytensor-federated [@RN23], the computation of differentiable objective functions is distributed via gRPC streams to federated worker nodes which carry out the simulation tasks. The worker nodes can therefore be launched on different machines, which allows for massive parallelization of cumputationally intense task utilizing computer clusters for example.
 
 
+![](.docs/source(images/federated_workers.svg)){width=100$}
+__Figure 2__: Federated computation setup for differentiable cost functions.
 
 ### Author contributions
 
