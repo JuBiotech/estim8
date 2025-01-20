@@ -79,7 +79,7 @@ $$
 For this matter, $\texttt{estim8}$ employs a so-called federated computing setup (Figure 2), which effectively introduces an addtional parallelization layer. Using pytensor-federated [@RN23], the computation of differentiable objective functions is distributed via gRPC streams to federated worker nodes which carry out the simulation tasks. The worker nodes can therefore be launched on different machines, which allows for massive parallelization of cumputationally intense task utilizing computer clusters for example.
 
 
-![](.docs/source(images/federated_workers.svg)){width=100$}
+![](./docs/source(images/federated_workers.svg)){width=100$}
 __Figure 2__: Federated computation setup for differentiable cost functions.
 
 ### Author contributions
