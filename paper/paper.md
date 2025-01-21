@@ -78,6 +78,8 @@ For this matter, $\texttt{estim8}$ provides the option to use a so-called federa
 
 
 ![](federated_workers.png){width="75%"}
+
+
 __Figure 2__: Federated computation setup for differentiable objective functions.
 
 ### Author contributions
