@@ -1,5 +1,4 @@
 ---
-
 title: 'estim8 - A python toolbox for bioprocess modeling and parameter estimation'
 tags:
   - Functional Mock-up Units
@@ -12,10 +11,10 @@ tags:
 
 authors:
   - name: Tobias Latour
-    orcid:
+    orcid: 0009-0009-7642-6853
     affiliation: 1
   - name: Daniel Strohmeier
-    orcid:
+    orcid: 0009-0008-9124-4153
     affiliation: 2
   - name: Wolfgang Wiechert
     orcid: 0000-0001-8501-0694
