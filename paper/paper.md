@@ -55,7 +55,7 @@ $\texttt{estim8}$ is an open source Python package compatible and tested with Wi
 ## Workflow
 The workflow in $\texttt{estim8}$ follows a structured approach to bioprocess modeling and parameter estimation (Figure 1). Users begin by developing mathematical models using third-party software that supports the FMI standard, such as OpenModelica [@RN22]. This open-source platform provides an interactive modeling environment with graphical capabilities and enables the export of models as Functional Mock-up Units (FMUs), supporting both CoSimulation and ModelExchange formats.
 
-The exported FMU is then integrated into $\texttt{estim8}$ using the $\texttt{FmuModel}$ class. The package implements a structured data hierarchy where $\texttt{Experiment}$ objects contain $\texttt{Measurement}$s, associated $\texttt{error\_models}$, and $\texttt{observation\_mapping}s$ . A key feature of $\texttt{estim8}$ is its comprehensive handling of biological replicates, which are crucial for ensuring statistical quality in biological experiments [@RN19]. The package accounts for varying conditions between replicates, such as different experimental conditions, through model replicates that can share global parameters while maintaining replicate-specific local parameters based on a user-defined $\texttt{ParameterMapping}$.
+The exported FMU is then integrated into $\texttt{estim8}$ using the $\texttt{FmuModel}$ class. The package implements a structured data hierarchy where $\texttt{Experiment}$ objects contain $\texttt{Measurement}$s, associated $\texttt{error\_models}$, and $\texttt{observation\_mapping}s$ . A key feature of $\texttt{estim8}$ is its comprehensive handling of biological replicates, which are crucial for ensuring statistical quality in biological experiments [@RN37]. The package accounts for varying conditions between replicates, such as different experimental conditions, through model replicates that can share global parameters while maintaining replicate-specific local parameters based on a user-defined $\texttt{ParameterMapping}$.
 
 At the core of $\texttt{estim8}$ is the $\texttt{Estimator}$ class, which serves as a central hub for managing parameter estimation tasks. This class
 stores all user input data and provides the functionality for parameter estimation. Identifiability analysis and uncertainty quantification are approached through profile likelihoods and Monte Carlo sampling respectively. The `visualization` module includes comprehensive visualization methods for analyzing simulation results, comparing model predictions with experimental data, and evaluating parameter estimation outcomes. A thourough guideline is given by example notebooks in our [documentation](https://estim8.readthedocs.io/en/latest/).
@@ -78,7 +78,7 @@ For this matter, $\texttt{estim8}$ employs a so-called federated computing setup
 
 
 ![](federated_workers.png)
-__Figure 2__: Federated computation setup for differentiable cost functions.
+__Figure 2__: Federated computation setup for differentiable objective functions.
 
 ### Author contributions
 
