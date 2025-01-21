@@ -60,7 +60,7 @@ The exported FMU is then integrated into $\texttt{estim8}$ using the $\texttt{Fm
 At the core of $\texttt{estim8}$ is the $\texttt{Estimator}$ class, which serves as a central hub for managing parameter estimation tasks. This class
 stores all user input data and provides the functionality for parameter estimation. Identifiability analysis and uncertainty quantification are approached through profile likelihoods and Monte Carlo sampling respectively. The `visualization` module includes comprehensive visualization methods for analyzing simulation results, comparing model predictions with experimental data, and evaluating parameter estimation outcomes. A thourough guideline is given by example notebooks in our [documentation](https://estim8.readthedocs.io/en/latest/).
 
-![](./docs/source/images/estim8_workflow.svg){width="100%"}
+![](estim8_workflow.svg){width="100%"}
 __Figure 1__: Schematic overview of the $\texttt{estim8}$ workflow.
 
 
@@ -77,7 +77,7 @@ $$
 For this matter, $\texttt{estim8}$ employs a so-called federated computing setup (Figure 2), which effectively introduces an addtional parallelization layer. Using pytensor-federated [@RN23], the computation of differentiable objective functions is distributed via gRPC streams to federated worker nodes which carry out the simulation tasks. The worker nodes can therefore be launched on different machines, which allows for massive parallelization of cumputationally intense task utilizing computer clusters for example.
 
 
-![](./docs/source(images/federated_workers.svg)){width=100$}
+![](federated_workers.svg){width=100$}
 __Figure 2__: Federated computation setup for differentiable cost functions.
 
 ### Author contributions
