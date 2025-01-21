@@ -74,7 +74,7 @@ $$
 \mathcal{L}(\theta_{global}|y_{global}) = \sum_{i=1}^{n}{\mathcal{L}(\theta_{local_{i}}|y_{local_i})}
 $$
 
-For this matter, $\texttt{estim8}$ employs a so-called federated computing setup (Figure 2), which effectively introduces an additional parallelization layer. Using pytensor-federated [@RN23], the computation of differentiable objective functions is distributed via gRPC streams to federated worker nodes which carry out the simulation tasks. The worker nodes can therefore be launched on different machines, which allows for massive parallelization of computationally intense task utilizing computer clusters for example.
+For this matter, $\texttt{estim8}$ provides the option to use a so-called federated computing setup (Figure 2), which effectively introduces an additional parallelization layer. Using pytensor-federated [@RN23], the computation of differentiable objective functions is distributed via gRPC streams to federated worker nodes which carry out the simulation tasks. The worker nodes can therefore be launched on different machines, which allows for massive parallelization of computationally intense task utilizing computer clusters for example.
 
 
 ![](federated_workers.png){scale="0.5"}
