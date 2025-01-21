@@ -37,7 +37,7 @@ bibliography: literature.bib
 ---
 
 # Summary
-Modeling and simulation are essential tools for understanding the complex nature of biological systemsy and exploiting the information contained in experimental data. We present the Python package $\texttt{estim8}, an FMI-compliant framework for ODE and DAE (bio)process modeling and parameter estimation. The source code is available on [GitHub](https://github.com/JuBiotech/estim8). The package is unit-tested on Windows and Linux. A thorough documentation in availabe under [https://estim8.readthedocs.io/en/latest/] including various example notebooks.
+Modeling and simulation are essential tools for understanding the complex nature of biological systemsy and exploiting the information contained in experimental data. We present the Python package $\texttt{estim8}, an FMI-compliant framework for ODE and DAE (bio)process modeling and parameter estimation. The source code is available on [GitHub](https://github.com/JuBiotech/estim8). The package is unit-tested on Windows and Linux. A thorough documentation in availabe under (https://estim8.readthedocs.io/en/latest/)[https://estim8.readthedocs.io/en/latest/] including various example notebooks.
 
 # Statement of Need
 Mathematical modeling has become a pivotal tool in biotechnological research [@RN29] and industrial bioprocess development [@RN27; @RN28] by parametrizing the information gained from experimental data and creating digital twins. While ordinary differential equations (ODEs) are commonly used to describe continuous biological systems, many biotechnological applications require differential algebraic equation (DAE) systems to handle discontinuities, discrete events, physical constraints, and embedded optimization criteria [@RN26].
