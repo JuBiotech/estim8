@@ -1,5 +1,5 @@
 ---
-title: 'estim8 - A python toolbox for bioprocess modeling and parameter estimation'
+title: 'estim8 - A Python toolbox for bioprocess modeling and parameter estimation'
 tags:
   - Functional Mock-up Units
   - Functional Mock-up Interface
