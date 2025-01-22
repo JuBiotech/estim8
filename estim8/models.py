@@ -233,7 +233,7 @@ class FmuModel(Estim8Model):
             if variable.initial == "exact":
                 self.parameters[variable.name] = float(variable.start)
             else:
-                self.observables.append(variable.name) 
+                self.observables.append(variable.name)
 
     def simulate(
         self,
