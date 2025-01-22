@@ -354,7 +354,7 @@ class Optimization:
         n_evos: int = 10,
         iterations=1,
     ) -> Tuple[dict, generalized_islands.PygmoEstimationInfo]:
-        """Continue optimizing the objective function using a pygmo archipelago.
+        """Continue optimizing the objective function using a pygmo archipelago object.
 
         Parameters
         ----------
