@@ -185,7 +185,7 @@ class Estimator:
 
         Notes
         -----
-        - The model must provide observables matching the measurement variables in the data
+        - The model must provide observables matching the values in the data observation mappings
         - When using DataFrames, observation mappings will be auto-generated
         - Parameter mappings allow different parameters per replicate if needed
         - Time vector can be automatically determined but explicit definition recommended
@@ -245,6 +245,7 @@ class Estimator:
             raise ValueError(
                 f"{type(value)} is not supported. Please use a datatype of {[Experiment, Dict[str,Experiment], pd.DataFrame, Dict[str, pd.DataFrame]]}"
             )
+        # get replicate IDs from data dictionary
         self.replicate_IDs = list(self._data.keys())
 
     @property
