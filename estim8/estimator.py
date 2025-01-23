@@ -224,9 +224,10 @@ class Estimator:
         ValueError
             If the data type is not supported.
         """
-        _data = {}
+        # setup internal data structure as dictionary with {replicate_ID: Experiment}
+        self._data = {}
         if not isinstance(value, dict):
-            _data.update(
+            self._data.update(
                 utils.EstimatorHelpers.make_replicate(
                     value, error_model=self.error_model
                 )
@@ -234,7 +235,7 @@ class Estimator:
 
         elif isinstance(value, dict):
             for r_id, replicate_data in value.items():
-                _data.update(
+                self._data.update(
                     utils.EstimatorHelpers.make_replicate(
                         replicate_data, replicate_ID=r_id, error_model=self.error_model
                     )
@@ -244,8 +245,7 @@ class Estimator:
             raise ValueError(
                 f"{type(value)} is not supported. Please use a datatype of {[Experiment, Dict[str,Experiment], pd.DataFrame, Dict[str, pd.DataFrame]]}"
             )
-        self._data = _data
-        self.replicate_IDs = list(_data.keys())
+        self.replicate_IDs = list(self._data.keys())
 
     @property
     def t(self):
