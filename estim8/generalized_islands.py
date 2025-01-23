@@ -555,6 +555,6 @@ class PygmoHelpers:
                 [island.extract(Estim8_mp_island).evo_trace for island in archi],
                 ignore_index=True,
             )
-        estimation_info.evo_trace = evo_trace
+            estimation_info.evo_trace = evo_trace
 
         return estimates, estimation_info
