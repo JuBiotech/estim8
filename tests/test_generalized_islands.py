@@ -24,7 +24,7 @@ def ud_problem(bounds):
 def archi(bounds):
     algos = ["de", "pso"]
     algos_kwargs = [{}, {}]
-    archi = PygmoHelpers.create_archipelago(
+    archi, info = PygmoHelpers.create_archipelago(
         objective=dummy_objective,
         bounds=bounds,
         algos=algos,
