@@ -70,7 +70,7 @@ __Figure 1__: Schematic overview of the $\texttt{estim8}$ workflow.
 Parameter estimation requires numerous simulation steps for evaluating a candidate solution $\theta$ by comparing the resulting model predictions to experimental data based on a statistical likelihood measure $\mathcal{L}$. This evaluation procedure – commonly referred to as the _objective function_ – in most application cases is the time-determining step for total estimation time.
 Many population-based solvers therefore enable parallel evaluations of the objective function, especially the pygmo package allows for highly parallelizable setups (grey parts of Figure 2).
 
-Integrating experimental replicates however dramatically increases the number of simulations, as the objective function for a global parameter set $\theta_{global}$ is now a differentiable function given by the sum of replicate specific likelihood measures:
+Integrating experimental replicates however dramatically increases the number of simulations, as the objective function for a global parameter set $\theta_{global}$ is now a differentiable function given by the sum of replicate specific local likelihood measures:
 $$
 \mathcal{L}(\theta_{global}|y_{global}) = \sum_{i=1}^{n}{\mathcal{L}(\theta_{local_{i}}|y_{local_i})}
 $$
