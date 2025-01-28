@@ -388,7 +388,8 @@ class Estimator:
         Returns
         -------
         float
-            Loss function value. Returns float('inf') if simulation crashes.
+            Loss function value. Returns np.inf if simulator crashes with RuntimeError, ValueError,
+            ZeroDivisionError, OverflowError or fmpy.fmi1.FMICallException,.
         """
         if metric is None:
             metric = self.metric
