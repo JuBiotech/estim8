@@ -20,6 +20,7 @@ from functools import partial
 from typing import Dict, List, Literal, get_args
 from warnings import warn
 
+import fmpy
 import numpy as np
 import pandas as pd
 import pytensor_federated
@@ -387,20 +388,33 @@ class Estimator:
         Returns
         -------
         float
-            Loss function value
+            Loss function value. Returns float('inf') if simulation crashes.
         """
         if metric is None:
             metric = self.metric
         t0, t_end, stepsize = self.t
 
-        sim = self.model.simulate(
-            t0=t0,
-            t_end=t_end,
-            stepsize=stepsize,
-            parameters=parameters,
-            observe=list(data.observation_mapping.values()),
-        )
-        return data.calculate_loss(simulation=sim, metric=metric)
+        try:
+            sim = self.model.simulate(
+                t0=t0,
+                t_end=t_end,
+                stepsize=stepsize,
+                parameters=parameters,
+                observe=list(data.observation_mapping.values()),
+            )
+            return data.calculate_loss(simulation=sim, metric=metric)
+        except (
+            # catch simulation exceptions in a more generic fashion
+            RuntimeError,
+            ValueError,
+            ZeroDivisionError,
+            OverflowError,
+            fmpy.fmi1.FMICallException,
+        ) as e:
+            warn(
+                "Simulation of the model using parameters {parameters} failed with {e}."
+            )
+            return np.inf
 
     def objective(self, theta: np.array) -> float:
         """
