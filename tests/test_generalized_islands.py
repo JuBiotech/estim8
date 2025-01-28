@@ -1,8 +1,14 @@
 import numpy as np
+import pandas as pd
 import pygmo
 import pytest
 
-from estim8.generalized_islands import PygmoEstimationInfo, PygmoHelpers, UDproblem
+from estim8.generalized_islands import (
+    Estim8_mp_island,
+    PygmoEstimationInfo,
+    PygmoHelpers,
+    UDproblem,
+)
 from estim8.objective import Objective
 
 
@@ -33,8 +39,23 @@ def archi(bounds):
         report=False,
         n_processes=1,
     )
-    archi.evolve(1)
     return archi
+
+
+@pytest.fixture
+def archi_with_trace(bounds):
+    algos = ["de", "pso"]
+    algos_kwargs = [{}, {}]
+    archi, info = PygmoHelpers.create_archipelago(
+        objective=dummy_objective,
+        bounds=bounds,
+        algos=algos,
+        algos_kwargs=algos_kwargs,
+        pop_size=10,
+        report=True,  # Enable reporting for trace
+        n_processes=1,
+    )
+    return archi, info
 
 
 def test_ud_problem_fitness(ud_problem):
@@ -89,3 +110,58 @@ def test_get_pygo_algo_instance(algo):
 def test_raise_wrong_algo():
     with pytest.raises(ValueError):
         PygmoHelpers.get_pygmo_algorithm_instance("wrong_algo")
+
+
+def test_estim8_mp_island_creation():
+    island = Estim8_mp_island()
+    assert island.evo_count == 0
+    assert isinstance(island.evo_trace, pd.DataFrame)
+    assert len(island.evo_trace) == 0
+
+
+def test_estim8_mp_island_copy():
+    island = Estim8_mp_island()
+    island.evo_count = 5
+    new_row = pd.DataFrame(
+        {
+            "evolution": [1],
+            "island_id": [id(island)],
+            "algorithm": ["test_algo"],
+            "champion_loss": [0.5],
+            "champion_theta": [[1.0, 2.0]],
+        }
+    )
+    island.evo_trace = pd.concat([island.evo_trace, new_row], ignore_index=True)
+
+    copied_island = island.__copy__()
+    assert copied_island.evo_count == 5
+    assert len(copied_island.evo_trace) == 1
+    assert not copied_island.evo_trace.empty
+
+
+def test_evolution_trace(archi_with_trace):
+    archi, info = archi_with_trace
+
+    archi.evolve(1)
+    archi.wait_check()
+    # Get results which should populate the trace
+    _, updated_info = PygmoHelpers.get_archipelago_results(archi, info)
+
+    # Check trace exists and has correct structure
+    assert updated_info.evo_trace is not None
+    assert isinstance(updated_info.evo_trace, pd.DataFrame)
+    assert len(updated_info.evo_trace) > 0
+
+    # Verify trace columns
+    expected_columns = [
+        "evolution",
+        "island_id",
+        "algorithm",
+        "champion_loss",
+        "champion_theta",
+    ]
+    assert all(col in updated_info.evo_trace.columns for col in expected_columns)
+
+    # Check data types
+    assert updated_info.evo_trace["evolution"].dtype == "int64"
+    assert updated_info.evo_trace["champion_loss"].dtype == "float"
