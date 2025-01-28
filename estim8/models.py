@@ -295,6 +295,7 @@ class FmuModel(Estim8Model):
             fmi_type=self._fmi_type,
             validate=True,
             solver=solver,
+            debug_logging=True,
             model_description=self._model_description,
             fmu_instance=self._fmu,
         )
