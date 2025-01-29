@@ -6,11 +6,11 @@ model SimpleBatch
   Real mu;
 
   // define variables
-  parameter Real X0 = 0.1;
+  parameter Real X0 = 0.2;
   parameter Real S0 = 10;
-  parameter Real mu_max = 0.5;
+  parameter Real mu_max = 0.4;
   parameter Real Ks = 0.01;
-  parameter Real Y_XS = 0.5;
+  parameter Real Y_XS = 0.35;
 
 equation
   der(X) = mu*X;
@@ -18,8 +18,8 @@ equation
   mu = mu_max*S/(Ks + S);
 
 // prevent negative substrate concentrations
- if (S<=0) then
-  S=0;
- end if;
+ when (S<=0) then
+  reinit(S, 0);
+ end when;
 
 end SimpleBatch;
