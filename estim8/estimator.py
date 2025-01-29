@@ -20,6 +20,7 @@ from functools import partial
 from typing import Dict, List, Literal, get_args
 from warnings import warn
 
+import fmpy
 import numpy as np
 import pandas as pd
 import pytensor_federated
@@ -185,7 +186,7 @@ class Estimator:
 
         Notes
         -----
-        - The model must provide observables matching the measurement variables in the data
+        - The model must provide observables matching the values in the data observation mappings
         - When using DataFrames, observation mappings will be auto-generated
         - Parameter mappings allow different parameters per replicate if needed
         - Time vector can be automatically determined but explicit definition recommended
@@ -224,9 +225,10 @@ class Estimator:
         ValueError
             If the data type is not supported.
         """
-        _data = {}
+        # setup internal data structure as dictionary with {replicate_ID: Experiment}
+        self._data = {}
         if not isinstance(value, dict):
-            _data.update(
+            self._data.update(
                 utils.EstimatorHelpers.make_replicate(
                     value, error_model=self.error_model
                 )
@@ -234,7 +236,7 @@ class Estimator:
 
         elif isinstance(value, dict):
             for r_id, replicate_data in value.items():
-                _data.update(
+                self._data.update(
                     utils.EstimatorHelpers.make_replicate(
                         replicate_data, replicate_ID=r_id, error_model=self.error_model
                     )
@@ -244,8 +246,8 @@ class Estimator:
             raise ValueError(
                 f"{type(value)} is not supported. Please use a datatype of {[Experiment, Dict[str,Experiment], pd.DataFrame, Dict[str, pd.DataFrame]]}"
             )
-        self._data = _data
-        self.replicate_IDs = list(_data.keys())
+        # get replicate IDs from data dictionary
+        self.replicate_IDs = list(self._data.keys())
 
     @property
     def t(self):
@@ -387,20 +389,34 @@ class Estimator:
         Returns
         -------
         float
-            Loss function value
+            Loss function value. Returns np.inf if simulator crashes with RuntimeError, ValueError,
+            ZeroDivisionError, OverflowError or fmpy.fmi1.FMICallException,.
         """
         if metric is None:
             metric = self.metric
         t0, t_end, stepsize = self.t
 
-        sim = self.model.simulate(
-            t0=t0,
-            t_end=t_end,
-            stepsize=stepsize,
-            parameters=parameters,
-            observe=list(data.observation_mapping.values()),
-        )
-        return data.calculate_loss(simulation=sim, metric=metric)
+        try:
+            sim = self.model.simulate(
+                t0=t0,
+                t_end=t_end,
+                stepsize=stepsize,
+                parameters=parameters,
+                observe=list(data.observation_mapping.values()),
+            )
+            return data.calculate_loss(simulation=sim, metric=metric)
+        except (
+            # catch simulation exceptions in a more generic fashion
+            RuntimeError,
+            ValueError,
+            ZeroDivisionError,
+            OverflowError,
+            fmpy.fmi1.FMICallException,
+        ) as e:
+            warn(
+                "Simulation of the model using parameters {parameters} failed with {e}."
+            )
+            return np.inf
 
     def objective(self, theta: np.array) -> float:
         """
