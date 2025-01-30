@@ -285,7 +285,7 @@ class Optimization:
         tuple
             The optimization result and additional information.
         """
-        return self.optimize_func(self.objective, **self.optimizesr_kwargs)
+        return self.optimize_func(self.objective, **self.optimizer_kwargs)
 
     @staticmethod
     def optimize_pygmo_archi(
