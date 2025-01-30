@@ -33,8 +33,6 @@ from .workers import Worker, init_logging, run_worker_pool
 
 SINGLE_ID = Constants.SINGLE_ID
 VALID_METRICS = Constants.VALID_METRICS
-SINGLE_ID = Constants.SINGLE_ID
-VALID_METRICS = Constants.VALID_METRICS
 
 
 class Estimator:
