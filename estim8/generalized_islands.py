@@ -16,11 +16,25 @@
 """This module implements helper functions for working with pygmo`s generalized islands approach."""
 
 import importlib
-from typing import Any, Dict, List, Protocol, Tuple, runtime_checkable
+import logging
+from typing import Any, Dict, List, Literal, Protocol, Tuple, runtime_checkable
 from warnings import warn
 
 import joblib
 import numpy as np
+import pandas as pd
+
+# Configure logger with a handler and formatter
+logger = logging.getLogger("estim8.generalized_islands")
+logger.setLevel(logging.INFO)
+
+# Add handler if none exists
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    )
+    logger.addHandler(handler)
 
 
 # Define protocol classes for type checking
@@ -102,6 +116,64 @@ pygmo = optional_import("pygmo")
 from .objective import Objective
 
 
+class Estim8_mp_island(pygmo.mp_island):
+    """A custom mp_island implementation with evolution logging capabilities."""
+
+    def __init__(self, use_pool=True):
+        super().__init__(use_pool)
+        self.evo_count = 0
+        # Create DataFrame to store evolution traces with explicit data types
+        self.evo_trace = pd.DataFrame(
+            {
+                "evolution": pd.Series(dtype="int"),
+                "island_id": pd.Series(dtype="int"),
+                "algorithm": pd.Series(dtype="str"),
+                "champion_loss": pd.Series(dtype="float"),
+                "champion_theta": pd.Series(dtype="object"),
+            }
+        )
+
+    def __copy__(self):
+        """Return a copy of the island."""
+        new_island = Estim8_mp_island(self._use_pool)
+        new_island.evo_count = self.evo_count
+        new_island.evo_trace = self.evo_trace.copy()  # Make sure to copy the trace too
+        return new_island
+
+    def run_evolve(self, algo, pop):
+        """Run evolution with logging of progress."""
+        res = super().run_evolve(algo, pop)
+
+        try:
+            self.evo_count += 1
+
+            # Log to console
+            logger.info(
+                f"## Evolution {self.evo_count} of island {id(self)} completed:\n"
+                f"      Algorithm: {algo.get_name()}\n"
+                f"      Champion loss: {res[1].champion_f[0]:.2e}"
+            )
+
+            # Store evolution data in DataFrame
+            new_row = pd.DataFrame(
+                {
+                    "evolution": self.evo_count,
+                    "island_id": id(self),
+                    "algorithm": algo.get_name(),
+                    "champion_loss": res[1].champion_f[0],
+                    "champion_theta": [res[1].champion_x],
+                },
+                index=[0],
+            )
+
+            self.evo_trace = pd.concat([self.evo_trace, new_row], ignore_index=True)
+
+            return res
+        except Exception as e:
+            logger.error(f"Evolution of island {id(self)} failed: {str(e)}")
+            raise
+
+
 class UDproblem:
     """A wrapper class around an Objective function with functions required for creating a user defined pygmo.problem."""
 
@@ -163,7 +235,13 @@ class UDproblem:
 class PygmoEstimationInfo:
     """An object to store additional information from an evolved archipelago as well as the archipelago itself."""
 
-    def __init__(self, archi: PygmoArchipelago, loss: float = np.inf, n_evos: int = 0):
+    def __init__(
+        self,
+        archi: PygmoArchipelago,
+        udi_type=pygmo.mp_island,
+        loss: float = np.inf,
+        n_evos: int = 0,
+    ):
         """
         Initialize the PygmoEstimationInfo class.
 
@@ -180,6 +258,8 @@ class PygmoEstimationInfo:
         self.loss = loss
         self.n_evos = n_evos
         self.archi = archi
+        self.udi_type = udi_type
+        self.evo_trace = None
 
     def get_f_evals(self) -> int:
         """
@@ -314,8 +394,8 @@ class PygmoHelpers:
             The number of processes.
         """
         for island in archi:
-            island.extract(pygmo.mp_island).shutdown_pool()
-            island.extract(pygmo.mp_island).init_pool(len(n_processes))
+            island.extract(Estim8_mp_island).shutdown_pool()
+            island.extract(Estim8_mp_island).init_pool(len(n_processes))
         # TODO: check for a better method here, like calling shutdown and init a single time globally
 
     @staticmethod
@@ -354,10 +434,17 @@ class PygmoHelpers:
         -------
         pygmo.archipelago
             The created archipelago.
+        PygmoEstimationInfo
+            An estimation info object containing the archipelago
         """
+
+        if report:
+            udi = Estim8_mp_island
+        else:
+            udi = pygmo.mp_island
         # init process pool backing mp_islands
-        pygmo.mp_island.shutdown_pool()
-        pygmo.mp_island.init_pool(n_processes)
+        udi.shutdown_pool()
+        udi.init_pool(n_processes)
 
         problem = pygmo.problem(UDproblem(objective, bounds))
 
@@ -383,12 +470,15 @@ class PygmoHelpers:
         get_reusable_executor().shutdown(wait=True)
 
         for i, (algo, pop) in enumerate(zip(algos, pops)):
-            archi.push_back(udi=pygmo.mp_island(), algo=algo, pop=pop)
+            archi.push_back(udi=udi(), algo=algo, pop=pop)
             if report:
                 print(f">>> Created Island {i+1} using {algos[i]}")
         archi.wait_check()
 
-        return archi
+        # initialize estimation info object
+        estimation_info = PygmoEstimationInfo(archi=archi, udi_type=udi)
+
+        return archi, estimation_info
 
     @staticmethod
     def extract_archipelago_problem(archi: PygmoArchipelago, i=0) -> PygmoProblem:
@@ -432,6 +522,7 @@ class PygmoHelpers:
         best_loss = min(loss_vals)
         champ_id = loss_vals.index(best_loss)
         best_theta = archi.get_champions_x()[champ_id]
+
         return {
             parameter: val for parameter, val in zip(unknowns, best_theta)
         }, best_loss
@@ -459,5 +550,13 @@ class PygmoHelpers:
 
         estimation_info.loss = loss
         estimation_info.archi = archi
+
+        # get evo trace if needed
+        if estimation_info.udi_type == Estim8_mp_island:
+            evo_trace = pd.concat(
+                [island.extract(Estim8_mp_island).evo_trace for island in archi],
+                ignore_index=True,
+            )
+            estimation_info.evo_trace = evo_trace
 
         return estimates, estimation_info

@@ -207,7 +207,7 @@ class Optimization:
         # define equivalents between methods for parallelization (if possible) and maximum iterations
         eq_kwargs = {
             "n_jobs": ["workers", "n_processes"],
-            "max_iter": ["maxiter", "n_calls", "iterations", "niter"],
+            "max_iter": ["maxiter", "n_calls", "niter"],
         }
 
         # apply equivalent kwargs:
@@ -285,7 +285,7 @@ class Optimization:
         tuple
             The optimization result and additional information.
         """
-        return self.optimize_func(self.objective, **self.optimizer_kwargs)
+        return self.optimize_func(self.objective, **self.optimizesr_kwargs)
 
     @staticmethod
     def optimize_pygmo_archi(
@@ -296,9 +296,8 @@ class Optimization:
         n_processes: int = joblib.cpu_count(),
         pop_size=50,
         topology=generalized_islands.pygmo.unconnected(),
-        n_evos: int = 10,
-        iterations=1,
-        report_level: int = 1,
+        max_iter: int = 10,
+        report: bool = False,
     ) -> Tuple[dict, generalized_islands.PygmoEstimationInfo]:
         """Optimize the objective function using a pygmo archipelago.
 
@@ -318,19 +317,17 @@ class Optimization:
             The population size, by default 50.
         topology : pygmo.topology, optional
             The topology of the archipelago, by default pygmo.unconnected().
-        n_evos : int, optional
-            The number of evolutions per iteration cycle, by default 10.
-        iterations : int, optional
-            The number of iteration cycles, by default 1.
-        report_level : int, optional
-            The report level, by default 1.
+        max_iter : int, optional
+            The number of evolutions, by default 10.
+        report: bool, optional
+            Whether to report logs of island creation and evolutions, by default False.
 
         Returns
         -------
         Tuple[dict, generalized_islands.PygmoEstimationInfo]
             The optimization result and additional information.
         """
-        archi = generalized_islands.PygmoHelpers.create_archipelago(
+        _, estimation_info = generalized_islands.PygmoHelpers.create_archipelago(
             objective=objective,
             bounds=bounds,
             algos=algos,
@@ -338,32 +335,26 @@ class Optimization:
             n_processes=n_processes,
             pop_size=pop_size,
             topology=topology,
-            report=report_level,
+            report=report,
         )
 
-        # initialize estimation info object
-        estimation_info = generalized_islands.PygmoEstimationInfo(archi=archi)
-
         return Optimization.optimize_pygmo_archipelago_continued(
-            estimation_info, n_evos, iterations
+            estimation_info, max_iter
         )
 
     @staticmethod
     def optimize_pygmo_archipelago_continued(
         estimation_info: generalized_islands.PygmoEstimationInfo,
-        n_evos: int = 10,
-        iterations=1,
+        max_iter: int = 10,
     ) -> Tuple[dict, generalized_islands.PygmoEstimationInfo]:
-        """Continue optimizing the objective function using a pygmo archipelago.
+        """Continue optimizing the objective function using a pygmo archipelago object.
 
         Parameters
         ----------
         estimation_info : generalized_islands.PygmoEstimationInfo
             The estimation information and the archipelago itself before evolution(s).
-        n_evos : int, optional
-            The number of evolutions per iteration cycle, by default 10.
-        iterations : int, optional
-            The number of iteration cycles, by default 1.
+        max_iter : int, optional
+            The number of evolutions, by default 10.
 
         Returns
         -------
@@ -373,7 +364,7 @@ class Optimization:
         archi = estimation_info.archi
 
         # evolve
-        archi.evolve(n_evos)
+        archi.evolve(max_iter)
         archi.wait()
 
         (
@@ -383,14 +374,8 @@ class Optimization:
             archi, estimation_info
         )
         # update number of evolutions
-        estimation_info.n_evos += n_evos
+        estimation_info.n_evos += max_iter
+        # shutdown pool
+        estimation_info.udi_type.shutdown_pool()
 
-        if iterations == 1:
-            return estimates, estimation_info
-
-        else:
-            generalized_islands.pygmo.mp_island.shutdown_pool()
-
-            return Optimization.optimize_pygmo_archipelago_continued(
-                estimation_info, n_evos, iterations - 1
-            )
+        return estimates, estimation_info

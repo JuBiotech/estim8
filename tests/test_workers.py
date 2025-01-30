@@ -1,4 +1,5 @@
 import multiprocessing
+import platform
 import time
 from dataclasses import dataclass
 
@@ -84,7 +85,10 @@ def test_federated_worker_error_handling():
 
 
 def test_run_worker_service(test_estimator):
-    host = "127.0.0.1"
+    if platform.system() == "Windows":
+        host = "localhost"
+    else:
+        host = "127.0.0.1"
     port = 9500
     p = multiprocessing.Process(
         target=run_worker_service, args=(host, port, test_estimator)
@@ -104,8 +108,12 @@ def test_run_worker_service(test_estimator):
 
 
 def test_run_worker_pool(test_estimator):
+    if platform.system() == "Windows":
+        host = "localhost"
+    else:
+        host = "127.0.0.1"
     ports = [9502, 9503]
-    processes = run_worker_pool("127.0.0.1", ports, test_estimator)
+    processes = run_worker_pool(host, ports, test_estimator)
 
     try:
         assert len(processes) == 2
