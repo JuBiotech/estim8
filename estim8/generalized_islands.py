@@ -434,6 +434,8 @@ class PygmoHelpers:
         -------
         pygmo.archipelago
             The created archipelago.
+        PygmoEstimationInfo
+            An estimation info object containing the archipelago
         """
 
         if report:
