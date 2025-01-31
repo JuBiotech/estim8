@@ -28,7 +28,7 @@ import pytensor_federated
 from . import error_models, models, utils
 from .datatypes import Constants, Experiment
 from .objective import Objective, global_objective
-from .optimizers import Optimization
+from .optimizers import Optimization, generalized_islands
 from .workers import Worker, init_logging, run_worker_pool
 
 SINGLE_ID = Constants.SINGLE_ID
@@ -646,7 +646,14 @@ class Estimator:
         self.check_problem_input()
 
         # check for parallelizatioon
-        if any([isinstance(method, list), n_jobs > 1, federated_workers > 1]):
+        if any(
+            [
+                isinstance(method, list),
+                n_jobs > 1,
+                federated_workers > 1,
+                isinstance(method, generalized_islands.PygmoEstimationInfo),
+            ]
+        ):
             if not federated_workers:
                 # define the objective function
                 self.func = partial(global_objective, local_objective=Worker(self))
