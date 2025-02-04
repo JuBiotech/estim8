@@ -26,7 +26,7 @@ from .utils import ModelHelpers
 
 plt.style.use("seaborn-v0_8-colorblind")
 from itertools import cycle
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 import numpy as np
 import pandas as pd
@@ -361,7 +361,9 @@ def plot_distributions(mc_samples: pd.DataFrame, ci_level: int = 0.95, kde=True)
     return fig
 
 
-def plot_pairs(mc_samples: pd.DataFrame, kind="kde"):
+def plot_pairs(
+    mc_samples: pd.DataFrame, kind: Literal["scatter", "kde", "hist", "reg"] = "kde"
+):
     """
     Plot pairwise relationships in the Monte Carlo samples.
 
