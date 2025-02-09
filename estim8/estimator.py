@@ -29,6 +29,7 @@ from . import error_models, models, utils
 from .datatypes import Constants, Experiment
 from .objective import Objective, global_objective
 from .optimizers import Optimization, generalized_islands
+from .profile import ProfileSampler, calculate_negll_thresshold
 from .workers import Worker, init_logging, run_worker_pool
 
 SINGLE_ID = Constants.SINGLE_ID
@@ -763,9 +764,10 @@ class Estimator:
         federated_workers: int = 0,
         optimizer_kwargs: dict = {},
         p_at_once=1,
-        n_points: int = 3,
-        dp_rel: float = 0.1,
+        max_steps: int = None,
+        stepsize: float = 0.02,
         p_inv: list = None,
+        alpha: float = 0.05,
         worker_kwargs: dict = {},
     ):
         """Calculate the profile likelihood for the estimated parameters.
@@ -822,9 +824,9 @@ class Estimator:
             )
 
         ## dp_rel
-        if (dp_rel > 1) or (dp_rel <= 0):
+        if (stepsize > 1) or (stepsize <= 0):
             raise ValueError(
-                f"Relative parameter variation width dp_rel must be in (0,1), not {dp_rel}."
+                f"Relative parameter variation width dp_rel must be in (0,1), not {stepsize}."
             )
 
         if self.metric != "negLL":
@@ -842,9 +844,10 @@ class Estimator:
                 optimizer_kwargs=optimizer_kwargs,
                 federated_workers=federated_workers,
                 p_at_once=p_at_once,
-                n_points=n_points,
-                dp_rel=dp_rel,
+                max_steps=max_steps,
+                stepsize=stepsize,
                 p_inv=p_inv,
+                alpha=alpha,
                 worker_kwargs=worker_kwargs,
             )
 
@@ -856,8 +859,9 @@ class Estimator:
                 method=method,
                 optimizer_kwargs=optimizer_kwargs,
                 p_at_once=p_at_once,
-                n_points=n_points,
-                dp_rel=dp_rel,
+                max_steps=max_steps,
+                stepsize=stepsize,
+                alpha=alpha,
                 p_inv=p_inv,
             )
 
@@ -878,9 +882,10 @@ class Estimator:
         method: str | List[str],
         optimizer_kwargs: dict,
         p_at_once: int = 1,
-        n_points: int = 3,
-        dp_rel: float = 0.1,
+        max_steps: int = None,
+        stepsize: float = 0.1,
         p_inv: list = None,
+        alpha: float = 0.05,
     ) -> Dict[str, List[Dict[str, float]]]:
         """
         Calculate profile likelihood for parameter uncertainty.
@@ -895,10 +900,10 @@ class Estimator:
             Keywords arguments for optimizer
         p_at_once : int, optional
             Parameters to profile simultaneously, by default 1
-        n_points : int, optional
-            Number of points per parameter, by default 3
-        dp_rel : float, optional
-            Relative parameter variation, by default 0.1
+        max_points : int, optional
+            Maximum number of steps per parameter and direction, by default None.
+        stepsize : float, optional
+            Relative parameter variation per iteration step, by default 0.02
         p_inv : list, optional
             Parameters to investigate, by default None
 
@@ -907,6 +912,12 @@ class Estimator:
         Dict[str, List[Dict[str, float]]]
             Profile likelihood results for each parameter
         """
+        # define negLL threshhold as stopping criterion
+        mle_negll = self.objective(list(p_opt.values()))
+        threshhold = calculate_negll_thresshold(
+            alpha=alpha, df=len(p_opt), mle_negll=mle_negll
+        )
+
         # Prepare Bounds, initial point, and investigated values for each parameter to investigate
         pl_jobs = []
         # define a task counter
@@ -918,21 +929,9 @@ class Estimator:
                 par: _bound for par, _bound in self.bounds.items() if not par == invest
             }
 
-            # create array of fixed parameter_i values
-            for fixed_par_i in np.linspace(
-                p_opt_i * (1 - dp_rel), p_opt_i * (1 + dp_rel), n_points
-            ):
+            for direction in [-1, 1]:
                 # deepcopy parameter mapping and update fixed value
                 _parameter_mapping = deepcopy(self.parameter_mapping)
-                updated_param = False
-                for mapper in _parameter_mapping._mapping:
-                    # update if local parameter exists in mapping
-                    if mapper.local_name == invest:
-                        mapper.value = fixed_par_i
-                        updated_param = True
-                        break
-                if not updated_param:
-                    _parameter_mapping.default_parameters[invest] = fixed_par_i
 
                 # define objective
                 objective = Objective(
@@ -941,23 +940,34 @@ class Estimator:
                     parameter_mapping=_parameter_mapping,
                 )
 
-                # and args for _profile_likelihood_calc and do the serialization of the Optimization object here
+                optimizer = Optimization(
+                    objective=objective,
+                    bounds=bounds_i,
+                    method=method,
+                    optimizer_kwargs=optimizer_kwargs,
+                    use_parallel=True,
+                    task_id=f"pl_job_{i}_0",
+                )
+
+                # Define the ProfileSampler, serialize it and add to jobs
                 pl_jobs.append(
                     (
-                        invest,  # parameter name
-                        fixed_par_i,  # parameter value
                         pickle.dumps(
-                            Optimization(
-                                objective=objective,
-                                bounds=bounds_i,
-                                method=method,
-                                optimizer_kwargs=optimizer_kwargs,
-                                use_parallel=True,
-                                task_id=f"pl_job_{i}",
+                            ProfileSampler(
+                                parameter=invest,
+                                mle=p_opt_i,
+                                mle_negll=mle_negll,
+                                negll_threshold=threshhold,
+                                optimizer=optimizer,
+                                bounds=list(self.bounds[invest]),
+                                direction=direction,
+                                stepsize=stepsize,
+                                max_steps=max_steps,
                             )
-                        ),
+                        )
                     )
                 )
+
         # initialize results
         result = {p: [] for p in p_inv}
         with futures.ProcessPoolExecutor(max_workers=p_at_once) as executor:
@@ -966,8 +976,13 @@ class Estimator:
             ]
 
             for opt_result in futures.as_completed(opt_results):
-                _inv, fixed_val, loss = opt_result.result()
-                result[_inv].append({"value": fixed_val, "loss": loss})
+                samples, _inv = opt_result.result()
+                result[_inv].append(samples)
+
+        result = {
+            parameter: np.unique(np.vstack(value), axis=0)
+            for parameter, value in result.items()
+        }
 
         return result
 
@@ -1116,26 +1131,25 @@ class Estimator:
         return res_mc
 
 
-def _profile_likelihood_calc(pl_job_args: tuple[str, float, Optimization]):
+def _profile_likelihood_calc(profile_sampler: tuple):
     """
-    Executes a single optimization task that is part of profile likelihoods.
+    Runs a ProfileSampler for a single parameter in descending or ascending direction.
 
     Parameters
     ----------
-    pl_job_args : tuple[str, float, Optimization]
-        A tuple containing the parameter name, fixed parameter value, and the serialized Optimization object.
+    profile_sampler : tuple
+        A tuple containing the serialized ProfileSampler object.
 
     Returns
     -------
-    tuple
-        A tuple containing the parameter name, fixed parameter value, and the loss value.
+    np.ndarray
+        An array containing the fixed parameter values and profile likelihood values.
     """
-    (invest, fixed_par_val, optimize_obj) = pl_job_args
-    # deserialize Optimization object
-    optimize_obj = pickle.loads(optimize_obj)
 
-    _, info = optimize_obj.optimize()
-    return (invest, fixed_par_val, info["fun"])
+    # deserialize Optimization object
+    profile_sampler = pickle.loads(profile_sampler)
+
+    return profile_sampler.walk_profile()
 
 
 def _mc_estimate(optimize_job):
