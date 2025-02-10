@@ -1,3 +1,20 @@
+# estim8
+# Copyright (C) 2025 Forschungszentrum Jülich GmbH
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""This module implements functionality for profiling likelihoods and likelihood based confidence intervals.
+"""
 import re
 from typing import List, Literal
 
@@ -9,11 +26,51 @@ from .optimizers import Optimization
 
 
 def calculate_negll_thresshold(alpha: float = 0.05, df: int = 1, mle_negll: float = 0):
+    """Calculate the negative log-likelihood threshold for profile likelihood.
+
+    Parameters
+    ----------
+    alpha : float, optional
+        Significance level, by default 0.05
+    df : int, optional
+        Degrees of freedom, by default 1
+    mle_negll : float, optional
+        Maximum likelihood estimate of negative log-likelihood, by default 0
+
+    Returns
+    -------
+    float
+        The threshold value for the negative log-likelihood
+    """
     quantile = chi2.ppf(1 - alpha, df)
     return mle_negll + quantile / 2
 
 
 class ProfileSampler:
+    """Sample points along a profile likelihood curve.
+
+    Parameters
+    ----------
+    parameter : str
+        Name of the parameter to profile
+    mle : float
+        Maximum likelihood estimate of the parameter
+    mle_negll : float
+        Negative log-likelihood at the MLE
+    negll_threshold : float
+        Threshold value for the negative log-likelihood
+    optimizer : Optimization
+        Optimizer instance to use for likelihood calculations
+    bounds : List[float]
+        Parameter bounds [lower, upper]
+    direction : Literal[-1, 1]
+        Direction to walk the profile (1 for positive, -1 for negative)
+    stepsize : float, optional
+        Relative step size for parameter updates, by default 0.02
+    max_steps : int, optional
+        Maximum number of steps to take, by default None, in which case the sampler proceeds until the negll threshold is reached.
+    """
+
     def __init__(
         self,
         parameter,
@@ -42,12 +99,12 @@ class ProfileSampler:
         self.finished = False
 
     def next_step(self):
-        """Take a next ficed step along the profile
+        """Take a next fixed step along the profile.
 
         Returns
         -------
         float
-            The next value of the parameter
+            The next value of the parameter to evaluate
         """
         next_step = self.samples[-1][0] + self.direction * self.stepsize * (
             self.mle if self.mle != 0 else 1
@@ -66,6 +123,13 @@ class ProfileSampler:
         return next_step
 
     def update_optimizer_objective(self, value: float):
+        """Update the optimizer's objective function with a new parameter value and set a new task_id.
+
+        Parameters
+        ----------
+        value : float
+            New value for the profiled parameter
+        """
         # update the objective functions parameter mapping with the new value of the parameter
         self.optimizer.objective
         self.optimizer.objective.parameter_mapping.set_parameter(self.parameter, value)
@@ -79,6 +143,11 @@ class ProfileSampler:
         self.optimizer.task_id = f"pl_job_{job_num}_{step_num}"
 
     def next_pl_sample(self):
+        """Calculate the next profile likelihood sample point.
+
+        Updates the internal samples array with the new point and checks if
+        the profile likelihood threshold has been exceeded.
+        """
         # get the next sample point
         next_value = self.next_step()
 
@@ -95,6 +164,15 @@ class ProfileSampler:
             self.finished = True
 
     def walk_profile(self):
+        """Walk the complete profile likelihood curve.
+
+        Returns
+        -------
+        tuple
+            Tuple containing:
+            - numpy.ndarray: Array of sample points [(parameter_value, negll), ...]
+            - str: Name of the profiled parameter
+        """
         while not self.finished:
             self.next_pl_sample()
 
@@ -102,26 +180,29 @@ class ProfileSampler:
 
 
 def approximate_confidence_interval(xvalues, negll_values, threshold):
-    """
-    Approximate the confidence interval from the profile likelihood results.
+    """Approximate the confidence interval from profile likelihood results.
 
     Parameters
     ----------
-    xvalues : np.ndarray
-        The x values of the profile likelihood.
-    negll_values : np.ndarray
-        The negative log likelihood values of the profile likelihood.
+    xvalues : numpy.ndarray
+        The parameter values of the profile likelihood curve
+    negll_values : numpy.ndarray
+        The negative log-likelihood values of the profile likelihood curve
     threshold : float
-        The threshold of the profile likelihood.
+        The threshold value for the confidence interval
 
     Returns
     -------
-    float
-        The lower bound of the confidence interval.
-    float
-        The upper bound of the confidence interval.
-    """
+    tuple
+        Tuple containing:
+        - float: Lower bound of the confidence interval
+        - float: Upper bound of the confidence interval
 
+    Raises
+    ------
+    ValueError
+        If confidence interval bounds cannot be found
+    """
     # Interpolate to find more precise crossing points
     f = interp1d(xvalues, negll_values - threshold, kind="cubic")
 
