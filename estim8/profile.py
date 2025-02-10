@@ -49,7 +49,9 @@ class ProfileSampler:
         float
             The next value of the parameter
         """
-        next_step = self.samples[-1][0] + self.direction * self.stepsize * self.mle
+        next_step = self.samples[-1][0] + self.direction * self.stepsize * (
+            self.mle if self.mle != 0 else 1
+        )
 
         # check if bounds are violated
         if not self.bounds[0] <= next_step <= self.bounds[1]:
@@ -58,7 +60,7 @@ class ProfileSampler:
 
         # check if max_steps is reached
         if self.max_steps is not None:
-            if len(self.samples[0]) == self.max_steps - 1:
+            if len(self.samples[0]) >= self.max_steps - 1:
                 self.finished = True
 
         return next_step
