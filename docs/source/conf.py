@@ -15,9 +15,9 @@ import estim8
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "estim8"
-copyright = "2024, Tobias Latour, Daniel Strohmeier"
+copyright = "2025, Forschungszentrum Jülich GmbH"
 author = "Tobias Latour, Daniel Strohmeier"
-release = "0.1.0"
+release = estim8.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -31,6 +31,7 @@ extensions = [
     "nbsphinx_link",
     "sphinx_copybutton",
 ]
+nb_execution_mode = "off"
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -39,10 +40,9 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
-# html_static_path = ["_static"]
+html_theme = "sphinx_book_theme"
+html_static_path = ["_static"]
 pygments_style = "sphinx"
-
 
 # autodoc config
 autodoc_mock_imports = ["pygmo", "m2w64-toolchain"]
