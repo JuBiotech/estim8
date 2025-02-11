@@ -3,6 +3,5 @@ sphinx_rtd_theme
 myst-parser
 numpydoc
 nbsphinx
-nbsphinx_link
 sphinx_copybutton
 pandoc
