@@ -24,13 +24,14 @@ release = estim8.__version__
 
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx_rtd_theme",
-    "myst_parser",
     "numpydoc",
     "nbsphinx",
-    "nbsphinx_link",
     "sphinx_copybutton",
+    "sphinx_book_theme",
+    "sphinxcontrib.mermaid",
+    "myst_nb",
 ]
+myst_enable_extensions = ["amsmath", "dollarmath"]
 nb_execution_mode = "off"
 
 templates_path = ["_templates"]

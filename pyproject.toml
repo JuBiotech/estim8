@@ -11,15 +11,17 @@ authors = [
     ]
 description = "A parameter estimation tool for DAE models implemented compliant to the Functional Mockup Interface"
 readme = "README.md"
-requires-python = ">=3.10.0,<3.11"
+requires-python = ">=3.10.0,<3.13"
 license = {text = "AGPLv3"}
 classifiers=[
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Intended Audience :: Science/Research",
 ]
 keywords=["Biorpocessmodeling", "Parameter estimation", "Functional Mockup Interface"]
 dependencies = [
-    "numpy>=1.17.0,<2",
+    "numpy>=1.17.0,<3",
     "fmpy",
     "scikit-optimize",
     "scikit-learn==1.4.2",
@@ -35,4 +37,4 @@ dependencies = [
 include = ["estim8"]
 
 [project.urls]
-GitLab = "https://jugit.fz-juelich.de/t.latour/estim8-s-test"
+GitHub = "https://github.com/JuBiotech/estim8"
