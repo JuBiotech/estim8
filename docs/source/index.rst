@@ -68,8 +68,7 @@ It is advised to create a fresh virtual environent:
 
 
 
-Tutorials
-===================
+
 .. toctree::
    :caption: Tutorials
    :maxdepth: 1
@@ -83,8 +82,6 @@ Tutorials
    notebooks/7. Federated worker architecture
 
 
-API Reference
-============
 
 .. toctree::
    :caption: API Reference
