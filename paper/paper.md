@@ -16,6 +16,9 @@ authors:
   - name: Daniel Strohmeier
     orcid: 0009-0008-9124-4153
     affiliation: 2
+  - name: Michael Osthege
+    orcid: 0000-0002-2734-7624
+    affiliation: 1
   - name: Wolfgang Wiechert
     orcid: 0000-0001-8501-0694
     affiliation: "1, 3"
@@ -90,7 +93,7 @@ The original draft was written by TL, editing and review was done by SN.
 The work was supervised by SN and funding was acquired by SN and WW.
 
 ### Acknowledgements
-The authors thank Michael Osthege for his advice on software development, and Niels Hollmann and Marijke Rudolph for application tests on real-world problems.
+The authors thank Niels Hollmann and Marijke Rudolph for application tests on real-world problems.
 
 ### Competing interests
 No competing interest is declared.
