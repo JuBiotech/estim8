@@ -378,7 +378,5 @@ class Optimization:
         )
         # update number of evolutions
         estimation_info.n_evos += max_iter
-        # shutdown pool
-        estimation_info.udi_type.shutdown_pool()
 
         return estimates, estimation_info
