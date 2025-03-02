@@ -206,17 +206,15 @@ class TestProfileLikelihood:
             method="de",
             max_iter=50,
             n_jobs=1,
-            n_points=3,
-            dp_rel=0.1,
+            stepsize=0.1,
             p_inv=["offset"],  # Test only one parameter for speed
+            max_steps=3,
         )
 
         assert isinstance(results, dict)
         assert "offset" in results
-        assert len(results["offset"]) == 3
-        for point in results["offset"]:
-            assert "value" in point
-            assert "loss" in point
+        assert isinstance(results["offset"], np.ndarray)
+        assert results["offset"].shape[1] == 2  # (parameter_value, negLL) pairs
 
     def test_profile_likelihood_parallel(self) -> None:
         """Test profile likelihood calculation with parallel processing"""
@@ -228,8 +226,8 @@ class TestProfileLikelihood:
             max_iter=50,
             n_jobs=2,
             p_at_once=2,
-            n_points=3,
-            dp_rel=0.1,
+            stepsize=0.1,
+            max_steps=3,
             p_inv=["offset", "slope"],
         )
 
@@ -237,7 +235,7 @@ class TestProfileLikelihood:
         assert len(results) == 2
         for param in ["offset", "slope"]:
             assert param in results
-            assert len(results[param]) == 3
+            assert isinstance(results[param], np.ndarray)
 
     def test_profile_likelihood_federated(self) -> None:
         """Test profile likelihood calculation with federated workers"""
@@ -248,27 +246,27 @@ class TestProfileLikelihood:
             method="de",
             max_iter=50,
             federated_workers=2,
-            n_points=3,
-            dp_rel=0.1,
+            stepsize=0.1,
+            max_steps=3,
             p_inv=["offset"],
             worker_kwargs={"host": "127.0.0.1", "start_at_port": 9300},
         )
 
         assert isinstance(results, dict)
         assert "offset" in results
-        assert len(results["offset"]) == 3
+        assert isinstance(results["offset"], np.ndarray)
 
     def test_profile_likelihood_invalid_inputs(self) -> None:
         """Test profile likelihood with invalid inputs"""
         p_opt, _ = self.estimator.estimate(method="de", max_iter=50, n_jobs=1)
 
-        # Test invalid dp_rel
+        # Test invalid stepsize
         with pytest.raises(ValueError):
             self.estimator.profile_likelihood(
                 p_opt=p_opt,
                 method="de",
                 max_iter=50,
-                dp_rel=1.5,  # Should be between 0 and 1
+                stepsize=1.5,  # Should be between 0 and 1
             )
 
         # Test invalid parameter name

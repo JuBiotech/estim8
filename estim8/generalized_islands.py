@@ -119,18 +119,27 @@ from .objective import Objective
 class Estim8_mp_island(pygmo.mp_island):
     """A custom mp_island implementation with evolution logging capabilities."""
 
-    def __init__(self, use_pool=True):
+    def __init__(self, use_pool=True, report_level=1):
+        """
+        report: int, optional
+            The report level during optimization, by default 1.
+            A report level of 1 yields data on the archipelago's island champions over evolutions.
+            With a report level of 2 the islands current states are printed in the Log.
+        """
         super().__init__(use_pool)
         self.evo_count = 0
-        # Create DataFrame to store evolution traces with explicit data types
+        self.report_level = report_level
+        # Create empty DataFrame with MultiIndex and explicit dtypes
         self.evo_trace = pd.DataFrame(
             {
-                "evolution": pd.Series(dtype="int"),
-                "island_id": pd.Series(dtype="int"),
-                "algorithm": pd.Series(dtype="str"),
-                "champion_loss": pd.Series(dtype="float"),
+                "island_id": pd.Series(dtype="int64"),
+                "champion_loss": pd.Series(dtype="float64"),
                 "champion_theta": pd.Series(dtype="object"),
             }
+        )
+        self.evo_trace.index = pd.MultiIndex.from_arrays(
+            [pd.Series(dtype="int64"), pd.Series(dtype="str")],
+            names=["evolution", "algorithm"],
         )
 
     def __copy__(self):
@@ -147,28 +156,33 @@ class Estim8_mp_island(pygmo.mp_island):
         try:
             self.evo_count += 1
 
-            # Log to console
-            logger.info(
-                f"## Evolution {self.evo_count} of island {id(self)} completed:\n"
-                f"      Algorithm: {algo.get_name()}\n"
-                f"      Champion loss: {res[1].champion_f[0]:.2e}"
-            )
+            if self.report_level == 2:
+                # Log to console
+                logger.info(
+                    f"## Evolution {self.evo_count} of island {id(self)} completed:\n"
+                    f"      Algorithm: {algo.get_name()}\n"
+                    f"      Champion loss: {res[1].champion_f[0]:.2e}"
+                )
 
-            # Store evolution data in DataFrame
-            new_row = pd.DataFrame(
+            # Create new row data directly without using pd.Series
+            new_data = pd.DataFrame(
                 {
-                    "evolution": self.evo_count,
-                    "island_id": id(self),
-                    "algorithm": algo.get_name(),
-                    "champion_loss": res[1].champion_f[0],
+                    "island_id": [id(self)],
+                    "champion_loss": [
+                        float(res[1].champion_f[0])
+                    ],  # Explicitly convert to float
                     "champion_theta": [res[1].champion_x],
                 },
-                index=[0],
+                index=pd.MultiIndex.from_tuples(
+                    [(self.evo_count, algo.get_name())],
+                    names=["evolution", "algorithm"],
+                ),
             )
 
-            self.evo_trace = pd.concat([self.evo_trace, new_row], ignore_index=True)
-
+            # Use copy=True and ignore_index=False to preserve MultiIndex
+            self.evo_trace = pd.concat([self.evo_trace, new_data], copy=True)
             return res
+
         except Exception as e:
             logger.error(f"Evolution of island {id(self)} failed: {str(e)}")
             raise
@@ -406,7 +420,7 @@ class PygmoHelpers:
         algos_kwargs: List[dict],
         pop_size: int,
         topology: Any = pygmo.fully_connected(),
-        report=False,
+        report=0,
         n_processes=joblib.cpu_count(),
     ) -> PygmoArchipelago:
         """Creates a pygmo.archipelago object using the generalized islands model.
@@ -425,8 +439,10 @@ class PygmoHelpers:
             Population size for each individual island.
         topology : pygmo.topology, optional
             Represents the connection policy between the islands of the archipelago, by default pygmo.fully_connected().
-        report : bool, optional
-            Whether to report the progress, by default False.
+        report: int, optional
+            The report level during optimization, by default 0. In case of report > 0, the evoltions are runned with :class:`Estim8_mp_island` which logs the evolution trace.
+            A report level of 1 yields data on the archipelago's island champions over evolutions.
+            With a report level of 2 the islands current states are printed in the Log.
         n_processes : int, optional
             The number of processes to use, by default joblib.cpu_count().
 
@@ -555,7 +571,7 @@ class PygmoHelpers:
         if estimation_info.udi_type == Estim8_mp_island:
             evo_trace = pd.concat(
                 [island.extract(Estim8_mp_island).evo_trace for island in archi],
-                ignore_index=True,
+                ignore_index=False,  # Changed this to preserve MultiIndex
             )
             estimation_info.evo_trace = evo_trace
 

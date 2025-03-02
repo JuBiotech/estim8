@@ -297,7 +297,7 @@ class Optimization:
         pop_size=50,
         topology=generalized_islands.pygmo.unconnected(),
         max_iter: int = 10,
-        report: bool = False,
+        report: int = 0,
     ) -> Tuple[dict, generalized_islands.PygmoEstimationInfo]:
         """Optimize the objective function using a pygmo archipelago.
 
@@ -319,8 +319,11 @@ class Optimization:
             The topology of the archipelago, by default pygmo.unconnected().
         max_iter : int, optional
             The number of evolutions, by default 10.
-        report: bool, optional
-            Whether to report logs of island creation and evolutions, by default False.
+        report: int, optional
+            The report level during optimization, by default 0.
+            A report level of 1 yields data on the archipelago's island champions over evolutions.
+            With a report level of 2 the islands current states are printed in the Log.
+
 
         Returns
         -------

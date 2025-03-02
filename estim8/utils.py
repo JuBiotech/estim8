@@ -176,6 +176,37 @@ class ModelHelpers:
 
             return complete_params
 
+        def set_parameter(self, name: str, value: float):
+            """
+            Set a parameter value by its name (either local or global).
+
+            Parameters
+            ----------
+            name : str
+                The parameter name (can be local or global)
+            value : float
+                The new parameter value
+
+            Raises
+            ------
+            ValueError
+                If the parameter name is not found in either local or global parameters
+            """
+            # Check if it's a local parameter
+            for param in self._mapping:
+                if param.local_name == name:
+                    param.value = value
+                    return
+
+            # Check if it's a global parameter
+            if name in self.default_parameters:
+                self.default_parameters[name] = value
+                return
+
+            raise ValueError(
+                f"Parameter '{name}' not found in local or global parameters"
+            )
+
 
 class EstimatorHelpers:
     @staticmethod

@@ -5,9 +5,9 @@
 
 
 
-`estim8` is a open-source Python toolbox for parameter estimation of dynamic (bio)process models compliant to the _Functional Mockup Interface_ ([FMI](https://fmi-standard.org/)) standard.
+`estim8` is a open source Python toolbox for parameter estimation of dynamic (bio)process models compliant to the _Functional Mockup Interface_ ([FMI](https://fmi-standard.org/)) standard.
 
-It provides a high-level API for simulation and analysis of FMU models, employing ODE or DAE systems written and compiled from third-party software like e.g. the open-source modeling environment of [OpenModelica](https://openmodelica.org/). `estim8` offers special functionality with respect to biotechnological applications, for example the modeling of experimental replicates or measurement noise.
+It provides a high-level API for simulation and analysis of FMU models, employing ODE or DAE systems written and compiled from third-party software like e.g. the open source modeling environment of [OpenModelica](https://openmodelica.org/). `estim8` offers special functionality with respect to biotechnological applications, for example the modeling of experimental replicates or measurement noise.
 
 For now, it relies on global meta-heuristic optimization algorithms from [`scipy`](https://scipy.org/) and the highly scalable approaches provided by [`pygmo`](https://esa.github.io/pygmo2/) to solve parameter estimation problems, and provides methods for uncertainty quantification.
 

@@ -117,26 +117,32 @@ def test_estim8_mp_island_creation():
     assert island.evo_count == 0
     assert isinstance(island.evo_trace, pd.DataFrame)
     assert len(island.evo_trace) == 0
+    assert isinstance(island.evo_trace.index, pd.MultiIndex)
+    assert island.evo_trace.index.names == ["evolution", "algorithm"]
 
 
 def test_estim8_mp_island_copy():
     island = Estim8_mp_island()
     island.evo_count = 5
-    new_row = pd.DataFrame(
+
+    # Create new data with MultiIndex
+    new_data = pd.DataFrame(
         {
-            "evolution": [1],
             "island_id": [id(island)],
-            "algorithm": ["test_algo"],
             "champion_loss": [0.5],
             "champion_theta": [[1.0, 2.0]],
-        }
+        },
+        index=pd.MultiIndex.from_arrays(
+            [[1], ["test_algo"]], names=["evolution", "algorithm"]
+        ),
     )
-    island.evo_trace = pd.concat([island.evo_trace, new_row], ignore_index=True)
+    island.evo_trace = pd.concat([island.evo_trace, new_data])
 
     copied_island = island.__copy__()
     assert copied_island.evo_count == 5
     assert len(copied_island.evo_trace) == 1
     assert not copied_island.evo_trace.empty
+    assert isinstance(copied_island.evo_trace.index, pd.MultiIndex)
 
 
 def test_evolution_trace(archi_with_trace):
@@ -152,16 +158,14 @@ def test_evolution_trace(archi_with_trace):
     assert isinstance(updated_info.evo_trace, pd.DataFrame)
     assert len(updated_info.evo_trace) > 0
 
-    # Verify trace columns
-    expected_columns = [
-        "evolution",
-        "island_id",
-        "algorithm",
-        "champion_loss",
-        "champion_theta",
-    ]
+    # Verify index structure
+    assert isinstance(updated_info.evo_trace.index, pd.MultiIndex)
+    assert updated_info.evo_trace.index.names == ["evolution", "algorithm"]
+
+    # Verify columns
+    expected_columns = ["island_id", "champion_loss", "champion_theta"]
     assert all(col in updated_info.evo_trace.columns for col in expected_columns)
 
     # Check data types
-    assert updated_info.evo_trace["evolution"].dtype == "int64"
-    assert updated_info.evo_trace["champion_loss"].dtype == "float"
+    assert updated_info.evo_trace.index.get_level_values("evolution").dtype == "int64"
+    assert updated_info.evo_trace["champion_loss"].dtype == "float64"

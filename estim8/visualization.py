@@ -22,11 +22,12 @@ import seaborn
 from .datatypes import Constants, Experiment, Measurement, ModelPrediction, Simulation
 from .estimator import Estimator
 from .models import Estim8Model
+from .profile import approximate_confidence_interval, calculate_negll_thresshold
 from .utils import ModelHelpers
 
 plt.style.use("seaborn-v0_8-colorblind")
 from itertools import cycle
-from typing import Dict, List
+from typing import Dict, List, Literal
 
 import numpy as np
 import pandas as pd
@@ -361,7 +362,9 @@ def plot_distributions(mc_samples: pd.DataFrame, ci_level: int = 0.95, kde=True)
     return fig
 
 
-def plot_pairs(mc_samples: pd.DataFrame, kind="kde"):
+def plot_pairs(
+    mc_samples: pd.DataFrame, kind: Literal["scatter", "kde", "hist", "reg"] = "kde"
+):
     """
     Plot pairwise relationships in the Monte Carlo samples.
 
@@ -529,7 +532,7 @@ def plot_predictives_many(ax, timepoints: np.ndarray, trajectories: np.ndarray, 
     return ax
 
 
-def plot_profile_likelihood(pl_results):
+def plot_profile_likelihood(pl_results, p_opt, alpha=0.05, show_coi=True):
     """
     Plot the profile likelihood results.
 
@@ -543,8 +546,6 @@ def plot_profile_likelihood(pl_results):
     matplotlib.figure.Figure
         The figure containing the plots.
     """
-    # TODO: add MLE
-    # TODO: CoI
 
     ncols = min(3, len(pl_results))
     nrows = int(len(pl_results) / ncols) + bool(len(pl_results) % ncols)
@@ -553,6 +554,15 @@ def plot_profile_likelihood(pl_results):
         nrows=nrows,
         ncols=ncols,
         figsize=(rel_figure_width * ncols, rel_fig_height * nrows),
+        sharey=True,
+    )
+
+    # get negLL minimum
+    mle_negll = np.hstack([elem[:, 1] for elem in pl_results.values()]).min()
+
+    # define negLL threshhold as stopping criterion
+    threshold = calculate_negll_thresshold(
+        alpha=alpha, df=len(p_opt), mle_negll=mle_negll
     )
 
     # ensure axes is array
@@ -563,14 +573,42 @@ def plot_profile_likelihood(pl_results):
         ax.set_axis_off()
 
     for ax, (param, results) in zip(axes.flat, pl_results.items()):
-        ax.set_axis_on()
-        df = pd.DataFrame(results).set_index("value")
-        df.sort_index(inplace=True)
+        xvals = results[:, 0]
+        neglls = results[:, 1]
 
-        ax.plot(df)
-        ax.set_title(param)
-        ax.set_ylabel("negLL")
+        # show point estimate
+        ax.axvline(
+            p_opt[param],
+            color="red",
+            linestyle="-",
+            label=f"estimate: {p_opt[param]:.3f}",
+        )
+
+        # show the thresshold for identifiability
+        ax.axhline(threshold - mle_negll, linestyle="--", color="grey")
+
+        if show_coi:
+            coi = approximate_confidence_interval(xvals, neglls, threshold)
+
+            ax.axvline(coi[0], linestyle="--", color="green")
+            ax.axvline(coi[1], linestyle="--", color="green")
+
+            # Add confidence interval to legend
+            ax.plot(
+                [],
+                [],
+                color="green",
+                linestyle="--",
+                label=f"{1-alpha} % CoI: {coi[0]:.3f}, {coi[1]:.3f}",
+            )
+
+        ax.legend(loc="best", ncol=2, fancybox=True)
+
+        ax.set_axis_on()
+
+        ax.plot(xvals, neglls - mle_negll, label="Profile Likelihood")
+        ax.set_ylabel(r"$\Delta \;  negLL$")
+        ax.set_xlabel(param)
 
     fig.tight_layout()
-
     return fig

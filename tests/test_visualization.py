@@ -161,15 +161,15 @@ def test_plot_estimates_many(estimator):
 def test_plot_profile_likelihood():
     # Create mock profile likelihood results matching actual estimator output format
     pl_results = {
-        "param1": [
-            {"value": val, "loss": -(val**2)} for val in np.linspace(-2, 2, 20)
-        ],
-        "param2": [
-            {"value": val, "loss": -((val - 2.5) ** 2)} for val in np.linspace(0, 5, 20)
-        ],
+        "param1": np.array([[val, -(val**2)] for val in np.linspace(-2, 2, 20)]),
+        "param2": np.array(
+            [[val, -((val - 2.5) ** 2)] for val in np.linspace(0, 5, 20)]
+        ),
     }
 
-    fig = plot_profile_likelihood(pl_results)
+    p_opt = {"param1": 0.0, "param2": 2.5}
+
+    fig = plot_profile_likelihood(pl_results, p_opt, show_coi=False)
     assert isinstance(fig, Figure)
     assert len(fig.axes) == 2  # One subplot per parameter
     plt.close(fig)

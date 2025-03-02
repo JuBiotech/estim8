@@ -1,8 +1,9 @@
 sphinx
-sphinx_rtd_theme
 myst-parser
+myst-nb
 numpydoc
 nbsphinx
-nbsphinx_link
 sphinx_copybutton
 pandoc
+sphinx-book-theme
+sphinxcontrib.mermaid

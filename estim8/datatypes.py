@@ -131,7 +131,7 @@ class TimeSeries:
         str
             A string representation of the TimeSeries object.
         """
-        return f"TimeSeries(name={self.name}, replicate_ID={self.replicate_ID})"
+        return f"{self.__class__.__name__}(name={self.name}, replicate_ID={self.replicate_ID})"
 
 
 class ModelPrediction(TimeSeries):
