@@ -26,35 +26,41 @@ Installation
 
 It is highly recommended to use a `conda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_  or preferably a `mamba <https://github.com/mamba-org/mamba>`_  environment manager.
 
+
 Installation from PyPi
 ----------------------
-``estim8`` can easily be installed using ``pip``:
+It is advised to create a fresh virtual environent using ``mamba`` (or ``conda`` alternatively):
+
+.. code-block:: bash
+
+    mamba create --name estim8 python==3.10
+    mamba activate estim8
+
+
+Please note that not all dependencies are packaged with the PyPI version. In order to use ``pygmo`` optimizers, the package needs to be installed manually. When using federated setups on Windows, additionally install ``m2w64-toolchain``:
+
+.. note::
+   When using the packages ``pygmo`` and ``m2w64-toolchain``, they need to be installed **before** installing ``estim8``!
+
+.. code-block:: bash
+
+    mamba install -c conda-forge pygmo m2w64-toolchain
+
+
+
+``estim8`` can then easily be installed using ``pip``:
 
 .. code-block:: bash
 
     pip install estim8
-
-Please note that not all dependencies are packaged with the PyPI version. In order to use ``pygmo`` optimizers, you have to install the package manually, e.g. using a ``mamba`` environment manager by running
-
-.. code-block:: bash
-
-    mamba install -c conda-forge pygmo
-
-
-When using federated setups on Windows, additionally install ``m2w64-toolchain`` using ``mamba``:
-
-
-.. code-block:: bash
-
-    mamba install -c conda-forge m2w64-toolchain
 
 
 Development installation
 ------------------------
 Download the `source code repository <https://github.com/JuBiotech/estim8>`_ to your computer, best by using `git <https://git-scm.com/>`_:
 
-#.   Navigate to the directory of your computer where you want the repository to be located
-#.   Open a terminal and run :code:`git clone https://github.com/JuBiotech/estim8.git`
+#.   Navigate to the directory of your computer where you want the repository to be located and open a terminal.
+#.   Clone the source code repository via :code:`git clone https://github.com/JuBiotech/estim8.git`
 #.   Change into the dowloaded directory :code:`cd estim8`
 
 
@@ -62,7 +68,7 @@ It is advised to create a fresh virtual environent:
 
 .. code-block:: bash
 
-    mamba create --name estim8
+    mamba create --name estim8 python==3.10
     mamba activate estim8
     mamba env update --name estim8 --file environment.yml
 
