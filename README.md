@@ -67,18 +67,6 @@ In Python, add the following lines ath the top of your code. Don't forget to adj
  sys.path.append('path/to/repo')
  ```
 
-### 1.2 Installation from PyPI
-
-```bash
-pip install estim8
-```
-
-
-> **_NOTE:_**  Please note that not all dependencies are packaged with the PyPI version. In order to use `pygmo` optimizers, you have to install the package manually, e.g. using a `conda` environment manager by running
-> ```bash
->conda install -c conda-forge pygmo
->```
-
 
 
 ## Documentation
