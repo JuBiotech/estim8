@@ -27,3 +27,5 @@ dependencies:
     - wheel
   # compiling FMU models from OMPython API
     - OMPython
+  # sphinx extensions
+    - -r docs/requirements.txt

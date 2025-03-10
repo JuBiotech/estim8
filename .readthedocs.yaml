@@ -22,6 +22,5 @@ conda:
 # Install additional documentation-specific packages
 python:
   install:
-    - requirements: docs/requirements.txt
     - method: pip
       path: .
