@@ -31,6 +31,7 @@ dependencies = [
     "pytensor-federated",
     "pytensor",
     "grpclib",
+    "openpyxl",
 ]
 
 [tool.setuptools.packages.find]
