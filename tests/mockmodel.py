@@ -18,8 +18,8 @@ class MockModel(Estim8Model):
         t_end: float,
         stepsize: float,
         parameters: dict = dict(),
-        observe: list = None,
-        replicate_ID: str = None,
+        observe: list | None = None,
+        replicate_ID: str | None = None,
     ):
         params = self.parameters.copy()
         params.update(parameters)

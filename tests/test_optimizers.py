@@ -67,7 +67,7 @@ class TestOptimization:
         assert not np.isinf(info.loss)
 
     def test_estimate_archi_continued(self, mockobjective: Objective):
-        _method = [Optimization.pygmo_algos[0]]
+        _method = [list(Optimization.pygmo_algos)[0]]
         opt = Optimization(
             objective=mockobjective,
             method=_method,

@@ -19,8 +19,7 @@ from estim8.workers import (
 from .mockmodel import MockModel
 
 
-@dataclass
-class TestExperiment(Experiment):
+class MockExperiment(Experiment):
     def __init__(self):
         t = np.array([0, 1, 2, 3])
         data = t + 1
@@ -37,12 +36,11 @@ class TestExperiment(Experiment):
 
 
 class TestEstimator:
-    def __init__(self):
-        self.model = MockModel()
-        self.replicate_IDs = ["r1", "r2"]
-        self.data = {"r1": TestExperiment(), "r2": TestExperiment()}
-        self.metric = "SS"
-        self.t = [0, 10, 0.1]
+    model = MockModel()
+    replicate_IDs = ["r1", "r2"]
+    data = {"r1": MockExperiment(), "r2": MockExperiment()}
+    metric = "SS"
+    t = [0, 10, 0.1]
 
     def objective_for_replicate(self, parameters, data, metric):
         return 1.0
