@@ -22,6 +22,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.stats import chi2
 
+from .objective import Objective
 from .optimizers import Optimization
 
 
@@ -81,7 +82,7 @@ class ProfileSampler:
         bounds: List[float],
         direction: Literal[-1, 1],
         stepsize=0.02,
-        max_steps: int = None,
+        max_steps: int | None = None,
     ):
         self.parameter = parameter
         self.mle = mle
@@ -131,13 +132,22 @@ class ProfileSampler:
             New value for the profiled parameter
         """
         # update the objective functions parameter mapping with the new value of the parameter
-        self.optimizer.objective
+        if not isinstance(self.optimizer.objective, Objective):
+            raise TypeError(
+                "Optimizer's objective must be an instance of Objective to update parameter mapping."
+            )
         self.optimizer.objective.parameter_mapping.set_parameter(self.parameter, value)
         # Parse current task ID using regex
         current_id = self.optimizer.task_id
         match = re.match(r"pl_job_(\d+)_(\d+)", current_id)
-        job_num = match.group(1)
-        step_num = int(match.group(2)) + 1
+
+        if match is None:
+            raise ValueError(
+                f"Optimizer task_id is not set properly. Cannot get task_id from {current_id}."
+            )
+        else:
+            job_num = match.group(1)
+            step_num = int(match.group(2)) + 1
 
         # Update task ID with new step number
         self.optimizer.task_id = f"pl_job_{job_num}_{step_num}"

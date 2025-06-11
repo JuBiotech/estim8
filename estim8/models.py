@@ -20,7 +20,7 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Literal
+from typing import Any, Dict, List, Literal
 
 import fmpy
 import numpy as np
@@ -55,8 +55,8 @@ class Estim8Model(abc.ABC):
         """
         Retrieve model parameters and observables.
         """
-        self.parameters: abc.abstract[dict]
-        self.observables: abc.abstract[list]
+        self.parameters: Dict[str, float]
+        self.observables: List[str]
 
     @abc.abstractmethod
     def simulate(
@@ -64,9 +64,9 @@ class Estim8Model(abc.ABC):
         t0: float,
         t_end: float,
         stepsize: float,
-        parameters: dict,
-        observe: list,
-        replicate_ID=SINGLE_ID,
+        parameters: Dict[str, float] = {},
+        observe: List[str] | None = None,
+        replicate_ID: str | None = SINGLE_ID,
     ) -> Simulation:
         """
         Simulate the model.
@@ -91,7 +91,6 @@ class Estim8Model(abc.ABC):
         Simulation
             The simulation results.
         """
-        return
 
 
 class FmuModel(Estim8Model):
@@ -240,12 +239,12 @@ class FmuModel(Estim8Model):
         t0: float,
         t_end: float,
         stepsize: float,
-        parameters: dict = {},
-        observe: list = None,
-        r_tol: float = None,
+        parameters: dict[str, float] = {},
+        observe: list[str] | None = None,
+        replicate_ID: str | None = SINGLE_ID,
+        r_tol: float | None = None,
         solver: Literal["CVode", "Euler"] = "CVode",
-        replicate_ID=SINGLE_ID,
-    ):
+    ) -> Simulation:
         """
         Simulate the FMU model.
 

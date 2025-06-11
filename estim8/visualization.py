@@ -41,7 +41,9 @@ rel_fig_height = 4
 
 
 def plot_simulation(
-    simulation: Simulation, observe: List[str] = None, experiment: Experiment = None
+    simulation: Simulation,
+    observe: List[str] | None = None,
+    experiment: Experiment | None = None,
 ):
     """
     Plot the simulation results.
@@ -274,7 +276,7 @@ def plot_heatmap(
     return fig
 
 
-def plot_distributions(mc_samples: pd.DataFrame, ci_level: int = 0.95, kde=True):
+def plot_distributions(mc_samples: pd.DataFrame, ci_level: float = 0.95, kde=True):
     """
     Plot the distributions of the Monte Carlo samples.
 
@@ -417,7 +419,9 @@ def plot_estimates_many(
     t0, t_end, stepsize = estimator.t
 
     # run the simulations
-    replicate_simulations = {rid: [] for rid in estimator.replicate_IDs}
+    replicate_simulations: Dict[str | None, List[Simulation]] = {
+        rid: [] for rid in estimator.replicate_IDs
+    }
 
     for i in range(len(mc_samples)):
         sample = mc_samples.iloc[i].to_dict()
@@ -436,6 +440,7 @@ def plot_estimates_many(
                     stepsize=stepsize,
                     parameters=parameters,
                     replicate_ID=rID,
+                    observe=observables[rID],
                 )
             )
 

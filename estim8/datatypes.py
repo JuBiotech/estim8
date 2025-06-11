@@ -61,7 +61,7 @@ class TimeSeries:
         name: str,
         timepoints: np.array,
         values: np.array,
-        replicate_ID: str = Constants.SINGLE_ID,
+        replicate_ID: str | None = Constants.SINGLE_ID,
     ):
         """
         Constructs all the necessary attributes for the TimeSeries object.
@@ -179,7 +179,9 @@ class Simulation:
     """
 
     def __init__(
-        self, simulation: Dict[str, np.array], replicate_ID: str = Constants.SINGLE_ID
+        self,
+        simulation: Dict[str, np.array],
+        replicate_ID: str | None = Constants.SINGLE_ID,
     ) -> None:
         """
         Constructs all the necessary attributes for the Simulation object.
@@ -249,7 +251,7 @@ class Measurement(TimeSeries):
         name,
         timepoints: np.array,
         values: np.array,
-        replicate_ID: str = Constants.SINGLE_ID,
+        replicate_ID: str | None = Constants.SINGLE_ID,
         errors: np.array = None,
         error_model: error_models.BaseErrorModel = error_models.LinearErrorModel(),
     ):
@@ -409,7 +411,7 @@ class Experiment:
         replicate_ID=Constants.SINGLE_ID,
         errors: pd.DataFrame = None,
         error_model: error_models.BaseErrorModel = error_models.LinearErrorModel(),
-        observation_mapping: Dict[str, str] = None,
+        observation_mapping: Dict[str, str] | None = None,
     ):
         """
         Constructs all the necessary attributes for the Experiment object.

@@ -35,7 +35,7 @@ myst_enable_extensions = ["amsmath", "dollarmath"]
 nb_execution_mode = "off"
 
 templates_path = ["_templates"]
-exclude_patterns = []
+# exclude_patterns = []
 
 
 # -- Options for HTML output -------------------------------------------------

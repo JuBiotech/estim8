@@ -18,7 +18,7 @@
 import inspect
 import pickle
 from functools import partial
-from typing import List, Tuple
+from typing import Callable, List, Tuple
 from warnings import warn
 
 import joblib
@@ -44,7 +44,7 @@ class Optimization:
         "gp": skopt.gp_minimize,
     }
 
-    pygmo_algos = [
+    pygmo_algos = {
         "scipy_optimize",
         "de1220",
         "bee_colony",
@@ -61,16 +61,16 @@ class Optimization:
         "ihs",
         "xnes",
         "de",
-    ]
+    }
 
     def __init__(
         self,
-        objective: callable,
+        objective: Objective | Callable,
         method: str | List[str],
         bounds: dict,
         optimizer_kwargs: dict = {},
         use_parallel=True,
-        task_id: str = None,
+        task_id: str = "estimate",
     ):
         """Initialize the Optimization class.
 
@@ -87,16 +87,16 @@ class Optimization:
         use_parallel : bool, optional
             Whether to use parallel optimization, by default True.
         task_id : str, optional
-            The task ID, by default None.
+            The task ID, by default "estimate".
         """
         self.bounds = bounds
         self.use_parallel = use_parallel
+        self.objective = objective
 
         if isinstance(method, generalized_islands.PygmoEstimationInfo):
             self.optimize_func = Optimization.optimize_pygmo_archipelago_continued
-            self.objective = method
+
         else:
-            self.objective = objective
             self.optimize_func = self.get_optimization_method(method)
 
         # prepare optimizer kwargs
@@ -105,7 +105,7 @@ class Optimization:
         self.task_id = task_id
 
     @staticmethod
-    def get_optimization_method(method):
+    def get_optimization_method(method: str | List[str]) -> Callable:
         """Get the optimization method.
 
         Parameters
@@ -135,7 +135,7 @@ class Optimization:
         elif isinstance(method, list):
             if set(method) - set(Optimization.pygmo_algos):
                 raise NotImplementedError(
-                    f"Algorithms {set(method)-Optimization.pygmo_algos} are not implemented."
+                    f"Algorithms {set(method)-set(Optimization.pygmo_algos)} are not implemented."
                 )
             opt_func = Optimization.optimize_pygmo_archi
 
@@ -162,6 +162,10 @@ class Optimization:
             If the list of algorithms doesn't match the list of algorithm kwargs.
         """
         _optimizer_kwargs = optimizer_kwargs.copy()
+
+        # continued optimization with pygmo archipelago
+        if isinstance(method, generalized_islands.PygmoEstimationInfo):
+            _optimizer_kwargs["estimation_info"] = method
 
         # check for pygmo algos and algos kwargs:
         if isinstance(method, list):
@@ -289,7 +293,7 @@ class Optimization:
 
     @staticmethod
     def optimize_pygmo_archi(
-        objective: callable,
+        objective: Callable,
         bounds: dict,
         algos: List[str],
         algos_kwargs: List[dict],
@@ -342,11 +346,12 @@ class Optimization:
         )
 
         return Optimization.optimize_pygmo_archipelago_continued(
-            estimation_info, max_iter
+            None, estimation_info, max_iter
         )
 
     @staticmethod
     def optimize_pygmo_archipelago_continued(
+        _,
         estimation_info: generalized_islands.PygmoEstimationInfo,
         max_iter: int = 10,
     ) -> Tuple[dict, generalized_islands.PygmoEstimationInfo]:
