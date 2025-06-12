@@ -166,6 +166,7 @@ class Estim8_mp_island(pygmo.mp_island):  # type: ignore
             [pd.Series(dtype="int64"), pd.Series(dtype="str")],
             names=["evolution", "algorithm"],
         )
+        super().__init__(use_pool)
 
     def __copy__(self):
         """Return a copy of the island."""
