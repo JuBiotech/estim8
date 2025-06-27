@@ -190,6 +190,8 @@ class Optimization:
         # update keywargs with bounds if neccessary
         if isinstance(method, list):
             _optimizer_kwargs["bounds"] = self.bounds
+            if "mc_job" or "pl_job" in self.task_id:
+                _optimizer_kwargs["init_pool"] = False
 
         elif method in self.optimization_funcs:
             bounds = list(self.bounds.values())
@@ -203,6 +205,7 @@ class Optimization:
             else:
                 _optimizer_kwargs["bounds"] = list(self.bounds.values())
 
+        # get starting point if neccessary and not provided
         if (method in ["local", "bh"]) and (not "x0" in optimizer_kwargs):
             _optimizer_kwargs["x0"] = np.array(
                 [np.mean(val) for val in self.bounds.values()]
@@ -302,6 +305,7 @@ class Optimization:
         topology=generalized_islands.pygmo.unconnected(),
         max_iter: int = 10,
         report: int = 0,
+        init_pool: bool = True,
     ) -> Tuple[dict, generalized_islands.PygmoEstimationInfo]:
         """Optimize the objective function using a pygmo archipelago.
 
@@ -343,6 +347,7 @@ class Optimization:
             pop_size=pop_size,
             topology=topology,
             report=report,
+            init_pool=init_pool,
         )
 
         return Optimization.optimize_pygmo_archipelago_continued(

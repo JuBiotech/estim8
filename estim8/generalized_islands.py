@@ -432,6 +432,7 @@ class PygmoHelpers:
         topology: Any = pygmo.fully_connected(),
         report=0,
         n_processes=joblib.cpu_count(),
+        init_pool: bool = True,
     ) -> Tuple[PygmoArchipelago, PygmoEstimationInfo]:
         """Creates a pygmo.archipelago object using the generalized islands model.
 
@@ -471,8 +472,9 @@ class PygmoHelpers:
             udi = pygmo.mp_island
             udi_kwargs = {}
         # init process pool backing mp_islands
-        udi.shutdown_pool()
-        udi.init_pool(n_processes)
+        if init_pool:
+            udi.shutdown_pool()
+        udi.init_pool(n_processes)  # wont to anything if already initialized
 
         problem = pygmo.problem(UDproblem(objective, bounds))
 
