@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from scipy.stats import chi2
 
+from estim8.objective import Objective
 from estim8.optimizers import Optimization
 from estim8.profile import (
     ProfileSampler,
@@ -56,14 +57,12 @@ class TestProfileSampler:
     def mock_optimizer(self):
         class MockOptimizer:
             def __init__(self):
-                self.objective = type(
-                    "obj",
-                    (),
-                    {
-                        "parameter_mapping": type(
-                            "mapping", (), {"set_parameter": lambda x, y, z: None}
-                        )()
-                    },
+                self.objective = Objective(
+                    func=lambda x: x,  # Simple quadratic function
+                    bounds={"test_param": [-1, 1]},
+                    parameter_mapping=type(
+                        "mapping", (), {"set_parameter": lambda x, y, z: None}
+                    )(),
                 )
                 self.task_id = "pl_job_1_0"
 
