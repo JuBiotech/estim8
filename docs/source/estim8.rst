@@ -1,91 +1,82 @@
-estim8 package
-==============
+API Reference
+============
 
+.. toctree::
+   :maxdepth: 2
 
-estim8.datatypes module
------------------------
-
+estim8.datatypes
+---------------
 .. automodule:: estim8.datatypes
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.error\_models module
----------------------------
-
+estim8.error_models
+------------------
 .. automodule:: estim8.error_models
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.estimator module
------------------------
-
+estim8.estimator
+---------------
 .. automodule:: estim8.estimator
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.generalized\_islands module
-----------------------------------
-
+estim8.generalized_islands
+-------------------------
 .. automodule:: estim8.generalized_islands
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.models module
---------------------
-
+estim8.models
+------------
 .. automodule:: estim8.models
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.objective module
------------------------
+estim8.profile
+-------------
+.. automodule:: estim8.profile
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
+estim8.objective
+---------------
 .. automodule:: estim8.objective
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.optimizers module
-------------------------
-
+estim8.optimizers
+----------------
 .. automodule:: estim8.optimizers
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.utils module
--------------------
-
+estim8.utils
+-----------
 .. automodule:: estim8.utils
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.visualization module
----------------------------
-
+estim8.visualization
+------------------
 .. automodule:: estim8.visualization
    :members:
    :undoc-members:
    :show-inheritance:
 
-estim8.workers module
----------------------
-
+estim8.workers
+-------------
 .. automodule:: estim8.workers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: estim8
    :members:
    :undoc-members:
    :show-inheritance:

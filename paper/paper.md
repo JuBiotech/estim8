@@ -16,6 +16,9 @@ authors:
   - name: Daniel Strohmeier
     orcid: 0009-0008-9124-4153
     affiliation: 2
+  - name: Michael Osthege
+    orcid: 0000-0002-2734-7624
+    affiliation: 1
   - name: Wolfgang Wiechert
     orcid: 0000-0001-8501-0694
     affiliation: "1, 3"
@@ -44,13 +47,13 @@ Mathematical modeling has become a pivotal tool in biotechnological research [@R
 
 Parameter estimation is crucial in this context, as many model parameters cannot be determined a priori and must be estimated. This is commonly addressed by "fitting" the model to experimental data. Although several general-purpose software tools for simulation and parameter estimation exist, they currently have significant limitations: Many only support ODE systems [@RN30; @RN33; @RN34; @RN31], require substantial workarounds for biological problems [@RN35; @RN36], or depend on proprietary licenses such as MATLAB for DAE simulation [@RN32].
 
-To address these limitations, we present $\texttt{estim8}$: a Python-based toolbox for simulation and parameter estimation of dynamic models. It is built on the Functional Mock-up Interface (FMI) standard and employs metaheuristic algorithms for optimization problems. $\texttt{estim8}$ provides specialized functionality for biotechnological applications, particularly in handling experimental replicates. By supporting model definition and simulation export from various FMI compliant third-party software, including the open-source OpenModelica platform [@RN22], $\texttt{estim8}$ enables comprehensive DAE support and convenient event handling.
+To address these limitations, we present $\texttt{estim8}$: a Python-based toolbox for simulation and parameter estimation of dynamic models. It is built on the Functional Mock-up Interface (FMI) standard and employs metaheuristic algorithms for optimization problems. $\texttt{estim8}$ provides specialized functionality for biotechnological applications, particularly in handling experimental replicates. By supporting model definition and simulation export from various FMI compliant third-party software, including the open source OpenModelica platform [@RN22], $\texttt{estim8}$ enables comprehensive DAE support and convenient event handling.
 
 
 # Materials and Methods
 
 ## Implementation
-$\texttt{estim8}$ is an open source Python package compatible and tested with Windows and Linux/Unix platforms. It comprises 10 modules: `estimator`, `models`, `datatypes`, `error_models`, `workers`, `generalized_islands`, `objective`, `optimizers`, `utils` and `visualization`. The modular, object-oriented architecture allows for easy expansion by new implementations, like e.g. custom simulators or cost functions. At the very core, $\texttt{estim8}$ currently features interactive simulation of Functional Mock-up Units (FMUs) via the ModelExchange or CoSimulation interface in Python utilizing FMPy [@RN14]. Parameter estimation and functionality for uncertainty quantification employ a broad range of optimization algorithms provided by the packages SciPy [@RN15] and pygmo [@RN21].
+$\texttt{estim8}$ is an open source Python package compatible and tested with Windows and Linux/Unix platforms. It comprises 11 modules: `estimator`, `models`, `datatypes`, `error_models`, `workers`, `generalized_islands`, `objective`, `optimizers`, `utils`, `profile` and `visualization`. The modular, object-oriented architecture allows for easy expansion by new implementations, like e.g. custom simulators or cost functions. At the very core, $\texttt{estim8}$ currently features interactive simulation of Functional Mock-up Units (FMUs) via the ModelExchange or CoSimulation interface in Python utilizing FMPy [@RN14]. Parameter estimation and functionality for uncertainty quantification employ a broad range of optimization algorithms provided by the packages SciPy [@RN15] and pygmo [@RN21].
 
 # Results and discussion
 ## Workflow
@@ -90,7 +93,7 @@ The original draft was written by TL, editing and review was done by SN.
 The work was supervised by SN and funding was acquired by SN and WW.
 
 ### Acknowledgements
-The authors thank Michael Osthege for his advice on software development, and Niels Hollmann and Marijke Rudolph for application tests on real-world problems.
+The authors thank Niels Hollmann and Marijke Rudolph for application tests on real-world problems.
 
 ### Competing interests
 No competing interest is declared.

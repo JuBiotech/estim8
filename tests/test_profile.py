@@ -100,7 +100,9 @@ class TestProfileSampler:
         assert (
             next_val
             == 0.0
-            + profile_sampler.direction * profile_sampler.stepsize * profile_sampler.mle
+            + profile_sampler.direction
+            * profile_sampler.stepsize
+            * (profile_sampler.mle if profile_sampler.mle != 0 else 1)
         )
 
     def test_bounds_handling(self, profile_sampler):
