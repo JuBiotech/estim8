@@ -376,7 +376,9 @@ class Measurement(TimeSeries):
                 self.errors,
                 self.error_model,
             )
-            for sampled_values in self.error_model.get_sampling(self.values, n_samples)
+            for sampled_values in self.error_model.get_sampling(
+                self.values, self.errors, n_samples
+            )
         ]
 
 

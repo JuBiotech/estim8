@@ -64,7 +64,9 @@ class BaseErrorModel(abc.ABC):
         """
         return
 
-    def get_sampling(self, values: np.array, n_samples: int) -> List[np.array]:
+    def get_sampling(
+        self, values: np.array, errors: np.array, n_samples: int
+    ) -> List[np.array]:
         """
         Resamples values of data given the class instance error_distribution.
 
@@ -80,7 +82,6 @@ class BaseErrorModel(abc.ABC):
         resampling : List[np.array]
             The generated Monte Carlo samples of values.
         """
-        errors = self.generate_error_data(values)
 
         resampling = []
         # apply distribution
