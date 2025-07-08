@@ -17,16 +17,7 @@
 
 import importlib
 import logging
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    List,
-    Literal,
-    Protocol,
-    Tuple,
-    runtime_checkable,
-)
+from typing import Any, Callable, Dict, List, Protocol, Tuple, runtime_checkable
 from warnings import warn
 
 import joblib
@@ -466,15 +457,14 @@ class PygmoHelpers:
         """
 
         if report:
-            udi = Estim8_mp_island
-            udi_kwargs = {"report_level": report}
+            udi = Estim8_mp_island(report_level=report)
+
         else:
-            udi = pygmo.mp_island
-            udi_kwargs = {}
+            udi = pygmo.mp_island()
+
         # init process pool backing mp_islands
-        if init_pool:
-            udi.shutdown_pool()
-        udi.init_pool(n_processes)  # wont to anything if already initialized
+        udi.shutdown_pool()
+        udi.init_pool(n_processes)
 
         problem = pygmo.problem(UDproblem(objective, bounds))
 
@@ -489,24 +479,16 @@ class PygmoHelpers:
 
         # create the populations and add to archipelago
         pop_creation_args = ((problem, pop_size, seed) for seed in range(len(algos)))
-        with joblib.parallel_backend("loky", n_jobs=len(algos)):
-            pops = joblib.Parallel(verbose=int(report))(
-                map(joblib.delayed(PygmoHelpers.create_pygmo_pop), pop_creation_args)
-            )
-
-        # kill idle processes
-        from joblib.externals.loky import get_reusable_executor
-
-        get_reusable_executor().shutdown(wait=True)
+        pops = list(map(PygmoHelpers.create_pygmo_pop, pop_creation_args))
 
         for i, (algo, pop) in enumerate(zip(algos, pops)):
-            archi.push_back(udi=udi(**udi_kwargs), algo=algo, pop=pop)
+            archi.push_back(udi=udi, algo=algo, pop=pop)
             if report:
                 print(f">>> Created Island {i+1} using {algos[i]}")
         archi.wait_check()
 
         # initialize estimation info object
-        estimation_info = PygmoEstimationInfo(archi=archi, udi_type=udi)
+        estimation_info = PygmoEstimationInfo(archi=archi, udi_type=type(udi))
 
         return archi, estimation_info
 
