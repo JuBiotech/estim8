@@ -173,6 +173,9 @@ class ProfileSampler:
         if info["fun"] > self.negll_threshold:
             self.finished = True
 
+        # del info object with eventally contains archipelago object
+        del info
+
     def walk_profile(self):
         """Walk the complete profile likelihood curve.
 
