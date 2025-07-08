@@ -167,10 +167,12 @@ class ProfileSampler:
         # calculate pl
         _, info = self.optimizer.optimize()
 
-        # add result to samples
-        self.samples = np.vstack((self.samples, np.array([next_value, info["fun"]])))
+        fun = getattr(info, "fun")
 
-        if info["fun"] > self.negll_threshold:
+        # add result to samples
+        self.samples = np.vstack((self.samples, np.array([next_value, fun])))
+
+        if fun > self.negll_threshold:
             self.finished = True
 
         # del info object with eventally contains archipelago object
