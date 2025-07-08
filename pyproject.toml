@@ -37,5 +37,13 @@ dependencies = [
 [tool.setuptools.packages.find]
 include = ["estim8"]
 
+[tool.setuptools.package-data]
+"estim8" = [
+    "py.typed",
+]
+
+
+
+
 [project.urls]
 GitHub = "https://github.com/JuBiotech/estim8"

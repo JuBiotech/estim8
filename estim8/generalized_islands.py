@@ -152,7 +152,6 @@ class Estim8_mp_island(pygmo.mp_island):  # type: ignore
             A report level of 1 yields data on the archipelago's island champions over evolutions.
             With a report level of 2 the islands current states are printed in the Log.
         """
-        super().__init__(use_pool)
         self.evo_count = 0
         self.report_level = report_level
         # Create empty DataFrame with MultiIndex and explicit dtypes
@@ -167,10 +166,11 @@ class Estim8_mp_island(pygmo.mp_island):  # type: ignore
             [pd.Series(dtype="int64"), pd.Series(dtype="str")],
             names=["evolution", "algorithm"],
         )
+        super().__init__(use_pool)
 
     def __copy__(self):
         """Return a copy of the island."""
-        new_island = Estim8_mp_island(self._use_pool)
+        new_island = Estim8_mp_island(self._use_pool, self.report_level)
         new_island.evo_count = self.evo_count
         new_island.evo_trace = self.evo_trace.copy()  # Make sure to copy the trace too
         return new_island
@@ -432,6 +432,7 @@ class PygmoHelpers:
         topology: Any = pygmo.fully_connected(),
         report=0,
         n_processes=joblib.cpu_count(),
+        init_pool: bool = True,
     ) -> Tuple[PygmoArchipelago, PygmoEstimationInfo]:
         """Creates a pygmo.archipelago object using the generalized islands model.
 
@@ -466,11 +467,14 @@ class PygmoHelpers:
 
         if report:
             udi = Estim8_mp_island
+            udi_kwargs = {"report_level": report}
         else:
             udi = pygmo.mp_island
+            udi_kwargs = {}
         # init process pool backing mp_islands
-        udi.shutdown_pool()
-        udi.init_pool(n_processes)
+        if init_pool:
+            udi.shutdown_pool()
+        udi.init_pool(n_processes)  # wont to anything if already initialized
 
         problem = pygmo.problem(UDproblem(objective, bounds))
 
@@ -496,7 +500,7 @@ class PygmoHelpers:
         get_reusable_executor().shutdown(wait=True)
 
         for i, (algo, pop) in enumerate(zip(algos, pops)):
-            archi.push_back(udi=udi(), algo=algo, pop=pop)
+            archi.push_back(udi=udi(**udi_kwargs), algo=algo, pop=pop)
             if report:
                 print(f">>> Created Island {i+1} using {algos[i]}")
         archi.wait_check()
