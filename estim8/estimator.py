@@ -1172,8 +1172,8 @@ def _mc_estimate(optimize_job):
     tuple
         The optimization result and additional information.
     """
-    optimize_job = pickle.loads(optimize_job)
-    mc_estimate = optimize_job.optimize()
+    _optimize_job: Optimization = pickle.loads(optimize_job)
+    mc_estimate = _optimize_job.optimize()
     return mc_estimate
 
 
