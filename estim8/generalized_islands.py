@@ -317,7 +317,7 @@ class PygmoEstimationInfo:
         str
             A string representation of the PygmoEstimationInfo object.
         """
-        return f"Fun: {self.fun} \n n_evos: {self.n_evos} \n"
+        return f"fun: {self.fun} \n n_evos: {self.n_evos} \n"
 
 
 class PygmoHelpers:
