@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "estim8"
-version = "0.1.2"
+version = "0.1.1"
 authors = [
     {name = "Tobias Latour", email = "t.latour@fz-juelich.de"},
     {name = "Daniel Strohmeier", email = "d.strohmeier@fz-juelich.de"},
