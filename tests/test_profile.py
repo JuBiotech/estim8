@@ -53,6 +53,9 @@ def test_approximate_confidence_interval_errors(sample_profile_data):
 
 
 class TestProfileSampler:
+    class OptimizeResult:
+        fun = 1
+
     @pytest.fixture
     def mock_optimizer(self):
         class MockOptimizer:
@@ -67,7 +70,7 @@ class TestProfileSampler:
                 self.task_id = "pl_job_1_0"
 
             def optimize(self):
-                return {}, {"fun": 1.0}
+                return {}, TestProfileSampler.OptimizeResult()
 
         return MockOptimizer()
 

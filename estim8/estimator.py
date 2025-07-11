@@ -1173,7 +1173,8 @@ def _mc_estimate(optimize_job):
         The optimization result and additional information.
     """
     _optimize_job: Optimization = pickle.loads(optimize_job)
-    mc_estimate = _optimize_job.optimize()
+    mc_estimate, _ = _optimize_job.optimize()
+    del _
     return mc_estimate
 
 

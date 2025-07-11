@@ -40,7 +40,7 @@ if not logger.handlers:
 # Define protocol classes for type checking
 @runtime_checkable
 class PygmoArchipelago(Protocol):
-    def get_champions_f(self) -> List[float]:
+    def get_champions_f(self) -> np.ndarray[List[float]]:
         ...
 
     def get_champions_x(self) -> List[List[float]]:
@@ -270,7 +270,7 @@ class PygmoEstimationInfo:
         self,
         archi: PygmoArchipelago,
         udi_type=pygmo.mp_island,
-        loss: float = np.inf,
+        fun: float = np.inf,
         n_evos: int = 0,
     ):
         """
@@ -281,12 +281,12 @@ class PygmoEstimationInfo:
 
         archi : PygmoArchipelago
             The archipelago.
-        loss : float, optional
-            Best loss value among all champions from the evolved archipelago, by default np.inf.
+        fun : float, optional
+            Best objective function value among all champions from the evolved archipelago, by default np.inf.
         n_evos : int, optional
             The number of total evolutions of the (evolved) archipelago, by default 0.
         """
-        self.loss = loss
+        self.fun = fun
         self.n_evos = n_evos
         self.archi = archi
         self.udi_type = udi_type
@@ -317,7 +317,7 @@ class PygmoEstimationInfo:
         str
             A string representation of the PygmoEstimationInfo object.
         """
-        return f"Loss: {self.loss} \n n_evos: {self.n_evos} \n"
+        return f"fun: {self.fun} \n n_evos: {self.n_evos} \n"
 
 
 class PygmoHelpers:
@@ -522,7 +522,7 @@ class PygmoHelpers:
         Returns
         -------
         Tuple[dict, float]
-            Dictionary of best estimates according to the smallest loss value.
+            Dictionary of best estimates according to the smallest loss aka objective function value.
             The smallest loss value among all islands.
         """
         unknowns = (
@@ -537,7 +537,7 @@ class PygmoHelpers:
 
         return {
             parameter: val for parameter, val in zip(unknowns, best_theta)
-        }, best_loss
+        }, best_loss[0]
 
     @staticmethod
     def get_archipelago_results(
@@ -558,9 +558,9 @@ class PygmoHelpers:
             Dictionary of best estimates according to the smallest loss value.
             Updated additional information about the evolved archipelago containing the archipelago itself.
         """
-        estimates, loss = PygmoHelpers.get_estimates_from_archipelago(archi)
+        estimates, fun = PygmoHelpers.get_estimates_from_archipelago(archi)
 
-        estimation_info.loss = loss
+        estimation_info.fun = fun
         estimation_info.archi = archi
 
         # get evo trace if needed
