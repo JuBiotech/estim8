@@ -18,16 +18,21 @@ This module implements Workers that serve as a computaion backend for an objecti
 Further it implements the federated Worker class and functions for launching a pool of such services.
 """
 
+from __future__ import annotations
+
 import abc
 import logging
 import multiprocessing
 import sys
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List
 
 import grpclib
 import numpy as np
 import pytensor_federated
 from numpy.core.multiarray import array as array
+
+if TYPE_CHECKING:
+    from .estimator import Estimator
 
 
 def init_logging():
@@ -83,7 +88,7 @@ class Worker:
         """
 
         # map theta to model parameters
-        replicate_ID = self.estimator.replicate_IDs[
+        replicate_ID: str | None = self.estimator.replicate_IDs[
             int(theta[-1])
         ]  # extract encoded replicate ID
         if self.mc_sampling:

@@ -17,7 +17,7 @@
 
 import importlib
 import logging
-from typing import Any, Dict, List, Literal, Protocol, Tuple, runtime_checkable
+from typing import Any, Callable, Dict, List, Protocol, Tuple, runtime_checkable
 from warnings import warn
 
 import joblib
@@ -40,7 +40,7 @@ if not logger.handlers:
 # Define protocol classes for type checking
 @runtime_checkable
 class PygmoArchipelago(Protocol):
-    def get_champions_f(self) -> List[float]:
+    def get_champions_f(self) -> np.ndarray[List[float]]:
         ...
 
     def get_champions_x(self) -> List[List[float]]:
@@ -55,16 +55,33 @@ class PygmoArchipelago(Protocol):
     def push_back(self, **kwargs) -> None:
         ...
 
+    def evolve(self, n_evolutions: int = 1) -> None:
+        ...
+
+    def wait(self) -> None:
+        ...
+
     def set_migrant_handling(self, handler: Any) -> None:
+        ...
+
+    def __iter__(self) -> Any:
         ...
 
 
 @runtime_checkable
-class PygmoIsland(Protocol):
-    def extract(self, cls: Any) -> Any:
+class PygmoMpIsland(Protocol):
+    """Protocol for pygmo.mp_island type checking"""
+
+    def __init__(self, use_pool: bool = True) -> None:
         ...
 
-    def get_population(self) -> Any:
+    def run_evolve(self, algo: Any, pop: Any) -> Any:
+        ...
+
+    def shutdown_pool(self) -> None:
+        ...
+
+    def init_pool(self, n_processes: int) -> None:
         ...
 
 
@@ -116,7 +133,7 @@ pygmo = optional_import("pygmo")
 from .objective import Objective
 
 
-class Estim8_mp_island(pygmo.mp_island):
+class Estim8_mp_island(pygmo.mp_island):  # type: ignore
     """A custom mp_island implementation with evolution logging capabilities."""
 
     def __init__(self, use_pool=True, report_level=1):
@@ -126,7 +143,6 @@ class Estim8_mp_island(pygmo.mp_island):
             A report level of 1 yields data on the archipelago's island champions over evolutions.
             With a report level of 2 the islands current states are printed in the Log.
         """
-        super().__init__(use_pool)
         self.evo_count = 0
         self.report_level = report_level
         # Create empty DataFrame with MultiIndex and explicit dtypes
@@ -141,10 +157,11 @@ class Estim8_mp_island(pygmo.mp_island):
             [pd.Series(dtype="int64"), pd.Series(dtype="str")],
             names=["evolution", "algorithm"],
         )
+        super().__init__(use_pool)
 
     def __copy__(self):
         """Return a copy of the island."""
-        new_island = Estim8_mp_island(self._use_pool)
+        new_island = Estim8_mp_island(self._use_pool, self.report_level)
         new_island.evo_count = self.evo_count
         new_island.evo_trace = self.evo_trace.copy()  # Make sure to copy the trace too
         return new_island
@@ -191,7 +208,7 @@ class Estim8_mp_island(pygmo.mp_island):
 class UDproblem:
     """A wrapper class around an Objective function with functions required for creating a user defined pygmo.problem."""
 
-    def __init__(self, objective: callable, bounds: dict):
+    def __init__(self, objective: Callable, bounds: dict):
         """
         Initialize the UDproblem class.
 
@@ -214,7 +231,7 @@ class UDproblem:
         list
             The keys of the bounds dictionary.
         """
-        return self.bounds.keys()
+        return list(self.bounds.keys())
 
     def fitness(self, theta) -> np.array:
         """
@@ -253,7 +270,7 @@ class PygmoEstimationInfo:
         self,
         archi: PygmoArchipelago,
         udi_type=pygmo.mp_island,
-        loss: float = np.inf,
+        fun: float = np.inf,
         n_evos: int = 0,
     ):
         """
@@ -264,12 +281,12 @@ class PygmoEstimationInfo:
 
         archi : PygmoArchipelago
             The archipelago.
-        loss : float, optional
-            Best loss value among all champions from the evolved archipelago, by default np.inf.
+        fun : float, optional
+            Best objective function value among all champions from the evolved archipelago, by default np.inf.
         n_evos : int, optional
             The number of total evolutions of the (evolved) archipelago, by default 0.
         """
-        self.loss = loss
+        self.fun = fun
         self.n_evos = n_evos
         self.archi = archi
         self.udi_type = udi_type
@@ -300,14 +317,14 @@ class PygmoEstimationInfo:
         str
             A string representation of the PygmoEstimationInfo object.
         """
-        return f"Loss: {self.loss} \n n_evos: {self.n_evos} \n"
+        return f"fun: {self.fun} \n n_evos: {self.n_evos} \n"
 
 
 class PygmoHelpers:
     """Helper functions for working with pygmo."""
 
     # use default algorithm kwargs from pyFOOMB
-    algo_default_kwargs = {
+    algo_default_kwargs: Dict[str, Dict[str, Any]] = {
         "scipy_optimize": {},
         "bee_colony": {"limit": 2, "gen": 10},
         "cmaes": {"gen": 10, "force_bounds": False, "ftol": 1e-8, "xtol": 1e-8},
@@ -332,7 +349,7 @@ class PygmoHelpers:
     }
 
     @staticmethod
-    def get_pygmo_algorithm_instance(name: str, kwargs: dict = None) -> Any:
+    def get_pygmo_algorithm_instance(name: str, **kwargs) -> Any:
         """Creates an instance of a pygmo.algorithm given the name and algorithm kwargs.
 
         Parameters
@@ -355,7 +372,7 @@ class PygmoHelpers:
         if not hasattr(pygmo, name):
             raise ValueError(f"{name} is not a supported pygmo algorithm.")
 
-        _kwargs = {}
+        _kwargs: Dict[str, Any] = {}
         # use default kwargs if possible
         if name in PygmoHelpers.algo_default_kwargs:
             _kwargs.update(PygmoHelpers.algo_default_kwargs[name])
@@ -374,7 +391,7 @@ class PygmoHelpers:
             # and continue with outer kwargs
             _kwargs = _outer_kwargs
             _kwargs["algo"] = PygmoHelpers.get_pygmo_algorithm_instance(
-                _outer_kwargs["algo"], _inner_kwargs
+                _outer_kwargs["algo"], **_inner_kwargs
             )
 
         return getattr(pygmo, name)(**_kwargs)
@@ -397,24 +414,8 @@ class PygmoHelpers:
         return pygmo.population(problem, pop_size, seed=seed)
 
     @staticmethod
-    def resize_archi_process_pools(archi: PygmoArchipelago, n_processes: int):
-        """Resize the process pools of the archipelago.
-
-        Parameters
-        ----------
-        archi : PygmoArchipelago
-            The archipelago.
-        n_processes : int
-            The number of processes.
-        """
-        for island in archi:
-            island.extract(Estim8_mp_island).shutdown_pool()
-            island.extract(Estim8_mp_island).init_pool(len(n_processes))
-        # TODO: check for a better method here, like calling shutdown and init a single time globally
-
-    @staticmethod
     def create_archipelago(
-        objective: callable,
+        objective: Callable,
         bounds: dict,
         algos: List[str],
         algos_kwargs: List[dict],
@@ -422,7 +423,8 @@ class PygmoHelpers:
         topology: Any = pygmo.fully_connected(),
         report=0,
         n_processes=joblib.cpu_count(),
-    ) -> PygmoArchipelago:
+        init_pool: bool = True,
+    ) -> Tuple[PygmoArchipelago, PygmoEstimationInfo]:
         """Creates a pygmo.archipelago object using the generalized islands model.
 
         Parameters
@@ -455,9 +457,11 @@ class PygmoHelpers:
         """
 
         if report:
-            udi = Estim8_mp_island
+            udi = Estim8_mp_island(report_level=report)
+
         else:
-            udi = pygmo.mp_island
+            udi = pygmo.mp_island()
+
         # init process pool backing mp_islands
         udi.shutdown_pool()
         udi.init_pool(n_processes)
@@ -466,7 +470,7 @@ class PygmoHelpers:
 
         # get optimization algorithm instances
         algos = [
-            PygmoHelpers.get_pygmo_algorithm_instance(algo, algo_kwargs)
+            PygmoHelpers.get_pygmo_algorithm_instance(algo, **algo_kwargs)
             for algo, algo_kwargs in zip(algos, algos_kwargs)
         ]
 
@@ -475,24 +479,16 @@ class PygmoHelpers:
 
         # create the populations and add to archipelago
         pop_creation_args = ((problem, pop_size, seed) for seed in range(len(algos)))
-        with joblib.parallel_backend("loky", n_jobs=len(algos)):
-            pops = joblib.Parallel(verbose=int(report))(
-                map(joblib.delayed(PygmoHelpers.create_pygmo_pop), pop_creation_args)
-            )
-
-        # kill idle processes
-        from joblib.externals.loky import get_reusable_executor
-
-        get_reusable_executor().shutdown(wait=True)
+        pops = list(map(PygmoHelpers.create_pygmo_pop, pop_creation_args))
 
         for i, (algo, pop) in enumerate(zip(algos, pops)):
-            archi.push_back(udi=udi(), algo=algo, pop=pop)
+            archi.push_back(udi=udi, algo=algo, pop=pop)
             if report:
                 print(f">>> Created Island {i+1} using {algos[i]}")
         archi.wait_check()
 
         # initialize estimation info object
-        estimation_info = PygmoEstimationInfo(archi=archi, udi_type=udi)
+        estimation_info = PygmoEstimationInfo(archi=archi, udi_type=type(udi))
 
         return archi, estimation_info
 
@@ -526,7 +522,7 @@ class PygmoHelpers:
         Returns
         -------
         Tuple[dict, float]
-            Dictionary of best estimates according to the smallest loss value.
+            Dictionary of best estimates according to the smallest loss aka objective function value.
             The smallest loss value among all islands.
         """
         unknowns = (
@@ -541,7 +537,7 @@ class PygmoHelpers:
 
         return {
             parameter: val for parameter, val in zip(unknowns, best_theta)
-        }, best_loss
+        }, best_loss[0]
 
     @staticmethod
     def get_archipelago_results(
@@ -562,9 +558,9 @@ class PygmoHelpers:
             Dictionary of best estimates according to the smallest loss value.
             Updated additional information about the evolved archipelago containing the archipelago itself.
         """
-        estimates, loss = PygmoHelpers.get_estimates_from_archipelago(archi)
+        estimates, fun = PygmoHelpers.get_estimates_from_archipelago(archi)
 
-        estimation_info.loss = loss
+        estimation_info.fun = fun
         estimation_info.archi = archi
 
         # get evo trace if needed

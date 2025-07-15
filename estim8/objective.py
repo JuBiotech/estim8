@@ -18,7 +18,7 @@
 import abc
 import os
 import pickle
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 import pytensor
@@ -27,7 +27,7 @@ from . import utils
 from .workers import Worker
 
 # global container for objective objects on subprocesses
-_objectives: dict[str, callable] = dict()
+_objectives: dict[str | None, Callable] = dict()
 
 
 class Objective:
@@ -38,7 +38,7 @@ class Objective:
 
     def __init__(
         self,
-        func: callable,
+        func: Callable,
         bounds: Dict[str, List[float]],
         parameter_mapping: utils.ModelHelpers.ParameterMapping,
         mc_sample: Optional[int] = 0,
@@ -103,7 +103,7 @@ class Objective:
 
 
 def objective_function_wrapper(
-    theta: np.array, objective, task_id: str = None
+    theta: np.array, objective, task_id: str | None = None
 ) -> float:
     """
     A wrapper around the objective. Creates global copy of the objective function in the current process to avoid serialization on every function call,
@@ -132,7 +132,7 @@ def objective_function_wrapper(
     return _objectives[task_id](theta)
 
 
-def global_objective(*replicate_par_sets, local_objective: callable):
+def global_objective(*replicate_par_sets, local_objective: Callable):
     """
     Calculates a global objective as the sum of local objective mapped to replicate parameter sets.
 
