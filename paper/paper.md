@@ -85,7 +85,7 @@ For this matter, $\texttt{estim8}$ provides the option to use a so-called federa
 __Figure 2__: Federated computation setup for differentiable objective functions.
 
 # Limitations
-Currently, $\texttt{estim8}$ does not support gradient-based optimization algorithms, which could enhance the computational efficiency of parameter estimation by utilizing parametric sensitivities [@RN43]. This feature will be addressed once OpenModelica supports FMI 3.0, which introduces functions for computing adjoint derivatives required for this purpose. Furthermore, we plan to expand the available optimization methods with Bayesian algorithms as provided by Python packages such as $\texttt{PyMC}$ [@RN45] or $\texttt{hopsy}$ [@RN44]. Overall, the framework is designed for small to medium complexity modeling and estimation tasks.
+Currently, $\texttt{estim8}$ does not support gradient-based optimization algorithms, which could enhance the computational efficiency of parameter estimation by utilizing parametric sensitivities [@RN43]. This feature will be addressed once OpenModelica supports FMI 3.0 [RN46], which introduces functions for computing adjoint derivatives required for this purpose. Furthermore, we plan to expand the available optimization methods with Bayesian algorithms as provided by Python packages such as $\texttt{PyMC}$ [@RN45] or $\texttt{hopsy}$ [@RN44]. Overall, the framework is designed for small to medium complexity modeling and estimation tasks.
 
 
 ### Author contributions
