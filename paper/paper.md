@@ -57,12 +57,12 @@ $\texttt{estim8}$ is an open source Python package compatible and tested with Wi
 # Workflow
 The workflow in $\texttt{estim8}$ follows a structured approach to bioprocess modeling and parameter estimation (Figure 1). Users begin by developing mathematical models using third-party software that supports the FMI standard, such as OpenModelica [@RN22]. This open-source platform provides an interactive modeling environment with graphical capabilities and enables the export of models as Functional Mock-up Units (FMUs), supporting both CoSimulation and ModelExchange formats. Noteworthy, models of the SBML [@RN40] standard can be translated to Modelica [@RN11], further enhancing the scope of modeling tools supported in $\texttt{estim8}$.
 
-The exported FMU is then loaded into $\texttt{estim8}$ using the $\texttt{FmuModel}$ class. The package implements a structured data hierarchy where $\texttt{Experiment}$ objects contain $\texttt{Measurement}$ objects with an  associated $\texttt{error\_model}$, and an $\texttt{observation\_mapping}$. A key feature of $\texttt{estim8}$ is its comprehensive handling of biological replicates, which are crucial for ensuring statistical quality in biological experiments [@RN37]. The package accounts for varying conditions between replicates, such as different experimental conditions, through model replicates that can share global parameters while maintaining replicate-specific local parameters based on a user-defined $\texttt{ParameterMapping}$ inspired by the $\texttt{murefi}$ package [@calibr8paper; @murefi].
+The exported FMU is then loaded into $\texttt{estim8}$ using the $\texttt{FmuModel}$ class. The package implements a structured data hierarchy where $\texttt{Experiment}$ objects contain $\texttt{Measurement}$ objects with an associated $\texttt{error\_model}$ and an $\texttt{observation\_mapping}$. A key feature of $\texttt{estim8}$ is its comprehensive handling of biological replicates, which are crucial for ensuring statistical quality in biological experiments [@RN37]. The package accounts for varying conditions between replicates, such as different experimental conditions, through model replicates that can share global parameters while maintaining replicate-specific local parameters based on a user-defined $\texttt{ParameterMapping}$ inspired by the $\texttt{murefi}$ package [@calibr8paper; @RN47].
 
 At the core of $\texttt{estim8}$ is the $\texttt{Estimator}$ class, which serves as a central hub for managing parameter estimation tasks. This class
 stores all user input data and provides the functionality for parameter estimation. Identifiability analysis and uncertainty quantification are approached through profile likelihoods and Monte Carlo sampling respectively. The `visualization` module includes comprehensive visualization methods for analyzing simulation results, comparing model predictions with experimental data, and evaluating parameter estimation outcomes. A thorough guideline is given by example notebooks in our [documentation](https://estim8.readthedocs.io/en/latest/).
 
-![](estim8_workflow.svg)
+![](estim8_workflow.png)
 __Figure 1__: Schematic overview of the $\texttt{estim8}$ workflow.
 
 
@@ -79,14 +79,13 @@ $$
 For this matter, $\texttt{estim8}$ provides the option to use a so-called federated computing setup (Figure 2), which effectively introduces an additional parallelization layer. Using $\texttt{pytensor-federated}$ [@RN23], the computation of differentiable objective functions is distributed via gRPC streams to federated worker nodes which carry out the simulation tasks. The worker nodes can therefore be launched on different machines in a computer cluster. This allows for massive parallelization of computationally expensive model units.
 
 
-![](federated_workers.svg){width="75%"}
+![](federated_workers.png){width="75%"}
 
 
 __Figure 2__: Federated computation setup for differentiable objective functions.
 
 # Limitations
-Currently, $\texttt{estim8}$ does not support gradient-based optimization algorithms, which could enhance the computational efficiency of parameter estimation by utilizing parametric sensitivities [@RN43]. This feature will be addressed once OpenModelica supports FMI 3.0 [RN46], which introduces functions for computing adjoint derivatives required for this purpose. Furthermore, we plan to expand the available optimization methods with Bayesian algorithms as provided by Python packages such as $\texttt{PyMC}$ [@RN45] or $\texttt{hopsy}$ [@RN44]. Overall, the framework is designed for small to medium complexity modeling and estimation tasks.
-
+Currently, $\texttt{estim8}$ does not incorporate gradient-based optimization algorithms, which could enhance parameter estimation efficiency through parametric sensitivities [@RN43]. This capability will be implemented when OpenModelica supports FMI 3.0 [@RN46], providing access to adjoint derivative functions, which are essential for efficiently computing gradients in high-dimensional parameter spaces—a key requirement for effective gradient-based optimization. Future development plans include expanding optimization methods with Bayesian algorithms from packages like $\texttt{PyMC}$ [@RN45] and $\texttt{hopsy}$ [@RN44].
 
 ### Author contributions
 $\texttt{estim8}$ was conceptualized by DS, SN and TL.
