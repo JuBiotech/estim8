@@ -78,7 +78,7 @@ def test_create_archipelago(archi):
 def test_get_estimates_from_archipelago(archi):
     estimates, loss = PygmoHelpers.get_estimates_from_archipelago(archi)
     assert isinstance(estimates, dict)
-    assert isinstance(loss[0], float)
+    assert isinstance(loss, float)
 
 
 def test_get_archipelago_results(archi):
@@ -88,7 +88,7 @@ def test_get_archipelago_results(archi):
     )
     assert isinstance(estimates, dict)
     assert isinstance(updated_info, PygmoEstimationInfo)
-    assert updated_info.loss < np.inf
+    assert updated_info.fun < np.inf
 
 
 def test_get_archi_f_evals(archi):
@@ -98,7 +98,7 @@ def test_get_archi_f_evals(archi):
 
 def test_str_archi(archi):
     estimation_info = PygmoEstimationInfo(archi)
-    assert "Loss" in str(estimation_info)
+    assert "fun" in str(estimation_info)
     assert "n_evos" in str(estimation_info)
 
 

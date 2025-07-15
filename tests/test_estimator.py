@@ -150,11 +150,9 @@ class TestMonteCarlo:
         )
 
         assert len(results) == 2
-        for res, info in results:
+        for res in results:
             assert isinstance(res, dict)
-            assert isinstance(info, dict)
             assert all(param in res for param in self.estimator.bounds)
-            assert "fun" in info
 
     def test_mc_sampling_parallel(self) -> None:
         """Test Monte Carlo sampling with parallel processing"""
@@ -163,11 +161,9 @@ class TestMonteCarlo:
         )
 
         assert len(results) == 2
-        for res, info in results:
+        for res in results:
             assert isinstance(res, dict)
-            assert isinstance(info, dict)
             assert all(param in res for param in self.estimator.bounds)
-            assert "fun" in info
 
     def test_mc_sampling_federated(self) -> None:
         """Test Monte Carlo sampling with federated workers"""
@@ -182,11 +178,9 @@ class TestMonteCarlo:
         )
 
         assert len(results) == 2
-        for res, info in results:
+        for res in results:
             assert isinstance(res, dict)
-            assert isinstance(info, dict)
             assert all(param in res for param in self.estimator.bounds)
-            assert "fun" in info
 
 
 class TestProfileLikelihood:

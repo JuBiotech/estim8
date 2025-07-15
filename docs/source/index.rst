@@ -37,10 +37,10 @@ It is advised to create a fresh virtual environent using ``mamba`` (or ``conda``
     mamba activate estim8
 
 
-Please note that not all dependencies are packaged with the PyPI version. In order to use ``pygmo`` optimizers, the package needs to be installed manually. When using federated setups on Windows, additionally install ``m2w64-toolchain``:
-
 .. note::
-   When using the packages ``pygmo`` and ``m2w64-toolchain``, they need to be installed **before** installing ``estim8``!
+   Not all dependencies are packaged with the PyPI version. In order to use ``pygmo`` optimizers, the package needs to be installed manually. When using federated setups on Windows, additionally install ``m2w64-toolchain``.
+   These packages need to be installed **before** installing ``estim8``!
+
 
 .. code-block:: bash
 

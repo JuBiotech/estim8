@@ -19,7 +19,7 @@ import concurrent.futures as futures
 import pickle
 from copy import deepcopy
 from functools import partial
-from typing import Dict, List, Literal, get_args
+from typing import Any, Callable, Dict, List, Literal, Tuple, get_args
 from warnings import warn
 
 import fmpy
@@ -140,11 +140,12 @@ class Estimator:
         | Dict[str, Experiment]
         | pd.DataFrame
         | Dict[str, pd.DataFrame],
-        t: List[float] = None,
+        t: List[float] | None = None,
         metric: VALID_METRICS = "SS",
         error_model: error_models.BaseErrorModel = error_models.LinearErrorModel(),
         parameter_mapping: list[utils.ModelHelpers.ParameterMapper]
-        | utils.ModelHelpers.ParameterMapping = None,
+        | utils.ModelHelpers.ParameterMapping
+        | None = None,
     ) -> None:
         """Initialize an Estimator instance for parameter estimation.
 
@@ -212,7 +213,7 @@ class Estimator:
         | Dict[str, Experiment]
         | pd.DataFrame
         | Dict[str, pd.DataFrame],
-    ) -> Dict[str, Experiment]:
+    ) -> None:
         """Set the experimental data and corresponding replicate IDs.
 
         Parameters
@@ -248,19 +249,19 @@ class Estimator:
                 f"{type(value)} is not supported. Please use a datatype of {[Experiment, Dict[str,Experiment], pd.DataFrame, Dict[str, pd.DataFrame]]}"
             )
         # get replicate IDs from data dictionary
-        self.replicate_IDs = list(self._data.keys())
+        self.replicate_IDs: List[str | None] = list(self._data.keys())
 
     @property
     def t(self):
         return self._t
 
     @t.setter
-    def t(self, value: List[float]):
+    def t(self, value: Tuple[float, float, float] | None):
         """Set the time vector for model simulations.
 
         Parameters
         ----------
-        value : List[float]
+        value : Tuple[float, float, float]
             The time vector as [t_start, t_end, stepsize].
 
         Raises
@@ -348,7 +349,7 @@ class Estimator:
         return self._hosts_and_ports
 
     @hosts_and_ports.setter
-    def hosts_and_ports(self, value: tuple[str, int]):
+    def hosts_and_ports(self, value: List[Tuple[str, int]]):
         """Set the hosts and ports for federated workers and compile a function for federated loss computation.
 
         Parameters
@@ -373,7 +374,7 @@ class Estimator:
         self,
         parameters: dict,
         data: Experiment,
-        metric: Literal["SS", "WSS", "negLL"] = None,
+        metric: Literal["SS", "WSS", "negLL"] | None = None,
     ) -> float:
         """
         Calculate loss function value for a single experimental replicate.
@@ -440,7 +441,7 @@ class Estimator:
             for rID in self.replicate_IDs
         }
 
-        loss = 0
+        loss: float = 0.0
         for rid, parameters in replicate_parameters.items():
             loss += self.objective_for_replicate(
                 parameters=parameters, data=self.data[rid], metric=self.metric
@@ -449,9 +450,9 @@ class Estimator:
 
     def launch_workers(
         self,
-        n_workers: int = None,
+        n_workers: int | None = None,
         host: str = "localhost",
-        ports: List[int] = None,
+        ports: List[int] | None = None,
         start_at_port: int = 9500,
         mc_sampling=False,
     ) -> None:
@@ -527,7 +528,8 @@ class Estimator:
             del self.server_processes
         del self._hosts_and_ports
 
-    def use_federated_workers(func):
+    @staticmethod
+    def use_federated_workers(func: Callable):
         """
         Decorator for managing federated worker lifecycle.
 
@@ -546,7 +548,7 @@ class Estimator:
         Returns
         -------
         callable
-            Wrapped function with worker lifecycle management
+            Wrapped function with worker lifecycle managementy
         """
 
         def inner_func(self, *args, **kwargs):
@@ -568,12 +570,12 @@ class Estimator:
                 result = func(self, *args, **kwargs)
                 return result
             except Exception as e:
-                error = e
+                error = True
                 return None, None
             finally:
                 self.shutdown_workers()
                 if error:
-                    raise error
+                    raise
 
         return inner_func
 
@@ -671,7 +673,7 @@ class Estimator:
                     federated_workers=federated_workers,
                     worker_kwargs=worker_kwargs,
                 )
-        else:
+        elif isinstance(method, str):
             return self._estimate(method=method, optimizer_kwargs=optimizer_kwargs)
 
     def _estimate(self, method: str, optimizer_kwargs: dict) -> tuple:
@@ -766,9 +768,9 @@ class Estimator:
         federated_workers: int = 0,
         optimizer_kwargs: dict = {},
         p_at_once=1,
-        max_steps: int = None,
+        max_steps: int | None = None,
         stepsize: float = 0.02,
-        p_inv: list = None,
+        p_inv: list | None = None,
         alpha: float = 0.05,
         worker_kwargs: dict = {},
     ):
@@ -883,10 +885,10 @@ class Estimator:
         p_opt: dict,
         method: str | List[str],
         optimizer_kwargs: dict,
+        p_inv: list[str],
         p_at_once: int = 1,
-        max_steps: int = None,
+        max_steps: int | None = None,
         stepsize: float = 0.1,
-        p_inv: list = None,
         alpha: float = 0.05,
     ) -> Dict[str, List[Dict[str, float]]]:
         """
@@ -900,14 +902,15 @@ class Estimator:
             Optimization method(s)
         optimizer_kwargs : dict
             Keywords arguments for optimizer
+        p_inv : list, optional
+            Parameters to investigate
         p_at_once : int, optional
             Parameters to profile simultaneously, by default 1
         max_points : int, optional
             Maximum number of steps per parameter and direction, by default None.
         stepsize : float, optional
             Relative parameter variation per iteration step, by default 0.02
-        p_inv : list, optional
-            Parameters to investigate, by default None
+
 
         Returns
         -------
@@ -930,8 +933,9 @@ class Estimator:
             bounds_i = {
                 par: _bound for par, _bound in self.bounds.items() if not par == invest
             }
+            directions: List[Literal[-1, 1]] = [-1, 1]
 
-            for direction in [-1, 1]:
+            for direction in directions:
                 # deepcopy parameter mapping and update fixed value
                 _parameter_mapping = deepcopy(self.parameter_mapping)
 
@@ -971,7 +975,7 @@ class Estimator:
                 )
 
         # initialize results
-        result = {p: [] for p in p_inv}
+        task_results: Dict[str, list] = {p: [] for p in p_inv}
         with futures.ProcessPoolExecutor(max_workers=p_at_once) as executor:
             opt_results = [
                 executor.submit(_profile_likelihood_calc, pl_job) for pl_job in pl_jobs
@@ -979,11 +983,11 @@ class Estimator:
 
             for opt_result in futures.as_completed(opt_results):
                 samples, _inv = opt_result.result()
-                result[_inv].append(samples)
+                task_results[_inv].append(samples)
 
-        result = {
+        result: Dict[str, np.ndarray] = {
             parameter: np.unique(np.vstack(value), axis=0)
-            for parameter, value in result.items()
+            for parameter, value in task_results.items()
         }
 
         return result
@@ -1133,7 +1137,7 @@ class Estimator:
         return res_mc
 
 
-def _profile_likelihood_calc(profile_sampler: tuple):
+def _profile_likelihood_calc(profile_sampler: Any):
     """
     Runs a ProfileSampler for a single parameter in descending or ascending direction.
 
@@ -1149,9 +1153,9 @@ def _profile_likelihood_calc(profile_sampler: tuple):
     """
 
     # deserialize Optimization object
-    profile_sampler = pickle.loads(profile_sampler)
+    _profile_sampler: ProfileSampler = pickle.loads(profile_sampler)
 
-    return profile_sampler.walk_profile()
+    return _profile_sampler.walk_profile()
 
 
 def _mc_estimate(optimize_job):
@@ -1168,8 +1172,9 @@ def _mc_estimate(optimize_job):
     tuple
         The optimization result and additional information.
     """
-    optimize_job = pickle.loads(optimize_job)
-    mc_estimate = optimize_job.optimize()
+    _optimize_job: Optimization = pickle.loads(optimize_job)
+    mc_estimate, _ = _optimize_job.optimize()
+    del _
     return mc_estimate
 
 

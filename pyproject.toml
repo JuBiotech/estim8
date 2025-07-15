@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=61.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "estim8"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     {name = "Tobias Latour", email = "t.latour@fz-juelich.de"},
     {name = "Daniel Strohmeier", email = "d.strohmeier@fz-juelich.de"},
@@ -36,6 +36,12 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["estim8"]
+
+[tool.setuptools.package-data]
+"estim8" = [
+    "py.typed",
+]
+
 
 [project.urls]
 GitHub = "https://github.com/JuBiotech/estim8"

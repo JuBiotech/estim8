@@ -15,6 +15,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """This module implements utility functions for the estim8 package.
 """
+from __future__ import annotations
+
 import abc
 import multiprocessing
 import os
@@ -22,7 +24,7 @@ import shutil
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 from warnings import warn
 
 import numpy as np
@@ -46,7 +48,7 @@ class ModelHelpers:
             global_name: str,
             replicate_ID: str,
             value: float = 0,
-            local_name: str = None,
+            local_name: str | None = None,
         ):
             """
             Parameters
@@ -83,9 +85,9 @@ class ModelHelpers:
     class ParameterMapping:
         def __init__(
             self,
-            mappings: List["ParameterMapper"],
+            mappings: List[ModelHelpers.ParameterMapper],
             default_parameters: dict,
-            replicate_IDs: list[str] = [SINGLE_ID],
+            replicate_IDs: list[str | None] = [SINGLE_ID],
         ):
             self._mapping = mappings
             self.default_parameters = default_parameters
@@ -133,7 +135,7 @@ class ModelHelpers:
             return df
 
         def replicate_handling(
-            self, replicate_ID: str, parameters: Dict[str, float] = dict()
+            self, replicate_ID: str | None, parameters: Dict[str, float] = dict()
         ):
             """
             Handle parameter mapping for a specific replicate.
@@ -213,8 +215,8 @@ class EstimatorHelpers:
     def make_replicate(
         data: Experiment | pd.DataFrame,
         errors: pd.DataFrame = None,
-        error_model: error_models.BaseErrorModel = None,
-        replicate_ID: str = SINGLE_ID,
+        error_model: error_models.BaseErrorModel = error_models.LinearErrorModel(),
+        replicate_ID: str | None = SINGLE_ID,
     ):
         """
         Create a replicate from data.
@@ -250,12 +252,12 @@ class EstimatorHelpers:
                 _data.replicate_ID = replicate_ID
         else:
             raise ValueError(
-                f"For using data of a single experiment pass a pandas.DataFrame or a datatypes.Experiment instance, not {type(value)}."
+                f"For using data of a single experiment pass a pandas.DataFrame or a datatypes.Experiment instance, not {type(data)}."
             )
         return {replicate_ID: _data}
 
     @staticmethod
-    def get_t_from_data(data: Dict[str, Experiment]) -> List[float]:
+    def get_t_from_data(data: Dict[str, Experiment]) -> Tuple[float, float, float]:
         """
         Get the time vector from data.
 
@@ -266,8 +268,8 @@ class EstimatorHelpers:
 
         Returns
         -------
-        List[float]
-            The time vector.
+        Tuple[float, float, float]
+            The time vector for simulations given by (t_start, t_end, stepsize).
         """
         t_end = np.array(
             [
@@ -281,7 +283,7 @@ class EstimatorHelpers:
                 for _exp in data.values()
             ]
         ).max()
-        return [0.0, t_end, t_end / max_data_points]
+        return 0.0, t_end, t_end / max_data_points
 
     @staticmethod
     def generate_mc_samples(estimator_data: dict[str, Experiment], n_samples: int):
@@ -312,7 +314,7 @@ class EstimatorHelpers:
 
     @staticmethod
     def make_tensor_function(
-        functions: list[callable], replicate_IDs: list[str]
+        functions: list[Callable], replicate_IDs: list[str | None]
     ) -> pytensor.function:
         """
         Create a tensor function.
@@ -423,7 +425,7 @@ class EstimatorHelpers:
         if all(worker_responses):
             return True
         else:
-            workers_down = np.array(hosts_and_ports)[~worker_responses]
+            workers_down = np.array(hosts_and_ports)[~np.array(worker_responses)]
             print(workers_down)
             return workers_down
 

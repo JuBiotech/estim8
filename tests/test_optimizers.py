@@ -64,10 +64,10 @@ class TestOptimization:
 
         res, info = opt.optimize()
         assert isinstance(res, dict)
-        assert not np.isinf(info.loss)
+        assert not np.isinf(info.fun)
 
     def test_estimate_archi_continued(self, mockobjective: Objective):
-        _method = [Optimization.pygmo_algos[0]]
+        _method = [list(Optimization.pygmo_algos)[0]]
         opt = Optimization(
             objective=mockobjective,
             method=_method,
@@ -87,4 +87,4 @@ class TestOptimization:
         res, est_info = opt.optimize()
 
         assert isinstance(res, dict)
-        assert not np.isinf(est_info.loss)
+        assert not np.isinf(est_info.fun)
