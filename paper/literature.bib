@@ -264,3 +264,93 @@
    year = {2019},
    type = {Journal Article}
 }
+
+@misc{RN42,
+   author = {{Modelica Association}},
+   title = {Functional Mock-up Interface (FMI)},
+   url = {https://fmi-standard.org/},
+   type = {Web Page},
+   year = {2023}
+}
+@misc{RN46,
+   author = {{Modelica Association}},
+   title = {FMI 3.0 What's New},
+   url = {https://fmi-standard.org/docs/3.0/#fmi-whats-new},
+   type = {Web Page},
+   year = {2022}
+}
+}
+
+@article{calibr8Paper,
+  doi       = {10.1371/journal.pcbi.1009223},
+  author    = {Helleckes, Laura Marie and
+               Osthege, Michael and
+               Wiechert, Wolfgang and
+               {von Lieres}, Eric and
+               Oldiges, Marco},
+  journal   = {PLOS Computational Biology},
+  publisher = {Public Library of Science},
+  title     = {Bayesian and calibration, process modeling and uncertainty quantification in biotechnology},
+  year      = {2022},
+  month     = {03},
+  volume    = {18},
+  url       = {https://doi.org/10.1371/journal.pcbi.1009223},
+  pages     = {1-46},
+  number    = {3},
+  note      = {Helleckes and Osthege contributed equally to this work}
+}
+
+@software{RN47,
+  author       = {Osthege, Michael and Helleckes, Laura},
+  title        = {JuBiotech/murefi: v5.1.0},
+  month        = feb,
+  year         = 2022,
+  publisher    = {Zenodo},
+  version      = {v5.1.0},
+  doi          = {10.5281/zenodo.6006488},
+  url          = {https://doi.org/10.5281/zenodo.6006488}
+}
+
+@article{RN43,
+    author = {Villaverde, Alejandro F and Fröhlich, Fabian and Weindl, Daniel and Hasenauer, Jan and Banga, Julio R},
+    title = {Benchmarking optimization methods for parameter estimation in large kinetic models},
+    journal = {Bioinformatics},
+    volume = {35},
+    number = {5},
+    pages = {830-838},
+    year = {2018},
+    month = {08},
+    abstract = {Kinetic models contain unknown parameters that are estimated by optimizing the fit to experimental data. This task can be computationally challenging due to the presence of local optima and ill-conditioning. While a variety of optimization methods have been suggested to surmount these issues, it is difficult to choose the best one for a given problem a priori. A systematic comparison of parameter estimation methods for problems with tens to hundreds of optimization variables is currently missing, and smaller studies provided contradictory findings.We use a collection of benchmarks to evaluate the performance of two families of optimization methods: (i) multi-starts of deterministic local searches and (ii) stochastic global optimization metaheuristics; the latter may be combined with deterministic local searches, leading to hybrid methods. A fair comparison is ensured through a collaborative evaluation and a consideration of multiple performance metrics. We discuss possible evaluation criteria to assess the trade-off between computational efficiency and robustness. Our results show that, thanks to recent advances in the calculation of parametric sensitivities, a multi-start of gradient-based local methods is often a successful strategy, but a better performance can be obtained with a hybrid metaheuristic. The best performer combines a global scatter search metaheuristic with an interior point local method, provided with gradients estimated with adjoint-based sensitivities. We provide an implementation of this method to render it available to the scientific community.The code to reproduce the results is provided as Supplementary Material and is available at Zenodo https://doi.org/10.5281/zenodo.1304034.Supplementary data are available at Bioinformatics online.},
+    issn = {1367-4803},
+    doi = {10.1093/bioinformatics/bty736},
+    url = {https://doi.org/10.1093/bioinformatics/bty736},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/35/5/830/48965908/bioinformatics\_35\_5\_830.pdf},
+}
+
+
+@article{RN44,
+    author = {Paul, Richard D and Jadebeck, Johann F and Stratmann, Anton and Wiechert, Wolfgang and Nöh, Katharina},
+    title = {hopsy — a methods marketplace for convex polytope sampling in Python},
+    journal = {Bioinformatics},
+    volume = {40},
+    number = {7},
+    pages = {btae430},
+    year = {2024},
+    month = {07},
+    abstract = {Effective collaboration between developers of Bayesian inference methods and users is key to advance our quantitative understanding of biosystems. We here present hopsy, a versatile open-source platform designed to provide convenient access to powerful Markov chain Monte Carlo sampling algorithms tailored to models defined on convex polytopes (CP). Based on the high-performance C++ sampling library HOPS, hopsy inherits its strengths and extends its functionalities with the accessibility of the Python programming language. A versatile plugin-mechanism enables seamless integration with domain-specific models, providing method developers with a framework for testing, benchmarking, and distributing CP samplers to approach real-world inference tasks. We showcase hopsy by solving common and newly composed domain-specific sampling problems, highlighting important design choices. By likening hopsy to a marketplace, we emphasize its role in bringing together users and developers, where users get access to state-of-the-art methods, and developers contribute their own innovative solutions for challenging domain-specific inference problems.Sources, documentation and a continuously updated list of sampling algorithms are available at https://jugit.fz-juelich.de/IBG-1/ModSim/hopsy, with Linux, Windows and MacOS binaries at https://pypi.org/project/hopsy/.},
+    issn = {1367-4811},
+    doi = {10.1093/bioinformatics/btae430},
+    url = {https://doi.org/10.1093/bioinformatics/btae430},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/40/7/btae430/58531207/btae430.pdf},
+}
+
+@article{RN45,
+   author = {Abril-Pla, Oriol and Andreani, Virgile and Carroll, Colin and Dong, Larry and Fonnesbeck, Christopher J. and Kochurov, Maxim and Kumar, Ravin and Lao, Junpeng and Luhmann, Christian C. and Martin, Osvaldo A. and Osthege, Michael and Vieira, Ricardo and Wiecki, Thomas and Zinkov, Robert},
+   doi = {10.7717/peerj-cs.1516},
+   journal = {PeerJ Comput. Sci.},
+   month = sep,
+   title = {{PyMC: a modern, and comprehensive probabilistic programming framework in Python}},
+   url = {https://peerj.com/articles/cs-1516},
+   volume = {9},
+   year = {2023}
+}
