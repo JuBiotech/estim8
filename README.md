@@ -72,6 +72,11 @@ In Python, add the following lines ath the top of your code. Don't forget to adj
 ## Documentation
 Check out our [documentation](https://estim8.readthedocs.io/en/latest/), where we provide a series of example notebooks.
 
+
+## Contributing
+When encountering bugs using `estim8`, please bring them to our attention by opening a issue. When doing so, describe the problem in detail and add minimal code snippets for reproducing the problem, along with any other material that might be usefull. For contributions to our codebase, clone the repository, create a new branch and open a pull request (PR).
+
+
 ## Usage and Citing
 ``estim8`` is licensed under the [GNU Affero General Public License v3.0](https://github.com/JuBiotech/estim8/blob/main/license.md).
 
