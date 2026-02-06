@@ -29,9 +29,10 @@ jobs:
     - name: setup OpenModelica compiler
       uses: OpenModelica/setup-openmodelica@v1.0
       with:
-        version: 'stable'
+        version: '1.25.5'
         packages: |
-          omc
+          'omc'
+          'omsimulator'
         libraries: |
           'Modelica 4.0.0'
 
