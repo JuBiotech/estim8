@@ -29,7 +29,7 @@ jobs:
     - name: setup OpenModelica compiler
       uses: OpenModelica/setup-openmodelica@v1.0.2
       with:
-        version: '1.25.5'
+        version: 'stable'
         packages: |
           'omc'
           'omsimulator'
