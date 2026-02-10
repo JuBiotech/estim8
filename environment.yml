@@ -3,7 +3,7 @@ channels:
 dependencies:
   - boa
   - conda-build
-  - python>=3.10,<3.13
+  - python>=3.10,<=3.13
   - numpy>=1.17.0,<2
   - pygmo==2.19.6
   - pip
@@ -25,7 +25,5 @@ dependencies:
   # for building
     - twine
     - wheel
-  # compiling FMU models from OMPython API
-    - OMPython
   # sphinx extensions
     - -r docs/requirements.txt
