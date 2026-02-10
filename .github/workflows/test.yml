@@ -23,7 +23,6 @@ jobs:
         version: 'stable'
         packages: |
           'omc'
-          'omsimulator'
         libraries: |
           'Modelica 4.0.0'
 
