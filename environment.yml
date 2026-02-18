@@ -1,8 +1,6 @@
 channels:
 - conda-forge
 dependencies:
-  - boa
-  - conda-build
   - python>=3.10,<=3.13
   - numpy
   - pygmo>=2.19.6
