@@ -45,9 +45,16 @@ Modeling and simulation are indispensable tools for understanding the complex na
 # Statement of Need
 Mathematical modeling has become a pivotal tool in biotechnological research and industrial bioprocess development, supporting the analysis and interpretation of complex experimental data [@RN29; @RN27; @RN28; @RN38]. While ordinary differential equations (ODEs) are commonly used to describe continuous biological systems, many biotechnological applications require differential algebraic equation (DAE) systems to handle discontinuities, discrete events, physical constraints, and embedded optimization criteria [@RN26].
 
-A crucial step in the modeling workflow is parameter estimation – or in layman's terms "fitting the model". This step questions the theoretical understanding of the system under investigation using real data, ultimately leading to confirmation or falsification of the hypotheses put forward. Although several general-purpose software tools for model formulation, simulation and parameter estimation exist, they currently have some limitations: Many only support ODE systems [@RN30; @RN33; @RN34; @RN31], require substantial workarounds for biological problems [@RN35; @RN36], or – although highly capable – pose a relatively high entry barrier with respect to model formulation [@RN32].
+A crucial step in the modeling workflow is parameter estimation – or in layman's terms "fitting the model". This step questions the theoretical understanding of the system under investigation using real data, ultimately leading to confirmation or falsification of the hypotheses put forward. Although several general-purpose software tools for model formulation, simulation and parameter estimation exist, they currently present various limitations for biotechnological applications, particularly regarding DAE support, handling of experimental replicates, and accessibility.
 
 To address these limitations, we present $\texttt{estim8}$: a Python-based toolbox for simulation and parameter estimation of dynamic models. It is built on the Functional Mock-up Interface (FMI) standard [@RN42] and employs metaheuristic algorithms for optimization problems. $\texttt{estim8}$ provides specialized functionality for biotechnological applications, particularly in handling experimental replicates. By supporting model definition and simulation export from various FMI-compliant third-party software, including the open source OpenModelica platform [@RN22], $\texttt{estim8}$ enables comprehensive DAE support and convenient event handling.
+
+
+# State of the Field
+
+Many established tools such as pyFOOMB [@RN30], COPASI [@RN33], PyBioNetFit [@RN34],
+and Data2Dynamics [@RN31] are limited to ODE systems, leaving users without native support for the  DAE formulations often required in biotechnological process modeling. DAE Tools [@RN35] and ModestPy [@RN36] support DAE systems but lack dedicated functionality for common biotechnological workflows such as structured handling of experimental replicates across different contidions, and therefore require substantial workarounds. The combination of AMICI [@RN32] and pyPESTO [@RN48] offers high-performance sensitivity analysis, but poses a relatively high entry barrier with respect to model formulation, making it less accessible to domain experts without extensive computational background.
+$\texttt{estim8}$ combines FMI-based DAE support, dedicated replicate handling, and an accessible Python interface to address these gaps.
 
 
 # Workflow
