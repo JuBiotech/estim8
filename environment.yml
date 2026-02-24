@@ -5,16 +5,16 @@ dependencies:
   - numpy
   - pygmo>=2.19.6
   - pip
-  - pandas<3
-  - openpyxl
-  - matplotlib
-  - seaborn
-  - grpclib
-  - pytensor
-  - fmpy
-  - scikit-learn==1.4.2
-  - scikit-optimize
   - pip:
+    - pandas<3
+    - openpyxl
+    - matplotlib
+    - seaborn
+    - grpclib
+    - pytensor
+    - fmpy
+    - scikit-learn
+    - scikit-optimize
     - pytensor-federated
     # for code testing
     - pytest
