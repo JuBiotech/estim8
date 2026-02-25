@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "estim8"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
     {name = "Tobias Latour", email = "t.latour@fz-juelich.de"},
     {name = "Daniel Strohmeier", email = "d.strohmeier@fz-juelich.de"},
     ]
 description = "A parameter estimation tool for DAE models implemented compliant to the Functional Mockup Interface"
 readme = "README.md"
-requires-python = ">=3.10.0,<3.13"
+requires-python = ">=3.10.0,<=3.13"
 license = {text = "AGPLv3"}
 classifiers=[
     "Programming Language :: Python :: 3",
@@ -21,13 +21,13 @@ classifiers=[
 ]
 keywords=["Biorpocessmodeling", "Parameter estimation", "Functional Mockup Interface"]
 dependencies = [
-    "numpy>=1.26.0,<2",
+    "numpy>=1.26.0",
     "fmpy",
     "scikit-optimize",
     "scikit-learn",
     "matplotlib",
     "seaborn",
-    "pandas",
+    "pandas<3",
     "pytensor-federated",
     "pytensor",
     "grpclib",

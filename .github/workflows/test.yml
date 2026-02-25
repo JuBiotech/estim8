@@ -7,33 +7,43 @@ on:
 
 jobs:
   test:
+    name: test (${{matrix.python-version}})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Miniconda
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        python-version: '3.10'
-        activate-environment: testim8
-        environment-file: environment.yml
-        auto-activate-base: false
-
     - name: setup OpenModelica compiler
-      uses: OpenModelica/setup-openmodelica@v1.0
+      uses: OpenModelica/setup-openmodelica@v1.0.2
       with:
         version: 'stable'
         packages: |
-          omc
+          'omc'
         libraries: |
           'Modelica 4.0.0'
+
+    - uses: actions/setup-python@v6
+      with:
+        python-version: 'pypy3.10'
+    - run: pip install OMPython
 
     - name: compile FMU
       shell: bash -l {0}
       run: |
         python tests/test_data/model_compilation.py --modelname Growth
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        python-version: ${{ matrix.python-version }}
+        activate-environment: testim8
+        environment-file: environment.yml
+        auto-activate-base: false
 
     - name: Run tests
       shell: bash -l {0}

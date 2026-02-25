@@ -1,22 +1,20 @@
 channels:
 - conda-forge
 dependencies:
-  - boa
-  - conda-build
-  - python>=3.10,<3.13
-  - numpy>=1.17.0,<2
-  - pygmo==2.19.6
+  - python>=3.10,<=3.13
+  - numpy
+  - pygmo>=2.19.6
   - pip
-  - pandas
-  - openpyxl
-  - matplotlib
-  - seaborn
-  - grpclib
-  - pytensor
-  - fmpy
-  - scikit-learn==1.4.2
-  - scikit-optimize
   - pip:
+    - pandas<3
+    - openpyxl
+    - matplotlib
+    - seaborn
+    - grpclib
+    - pytensor
+    - fmpy
+    - scikit-learn
+    - scikit-optimize
     - pytensor-federated
     # for code testing
     - pytest
@@ -25,7 +23,5 @@ dependencies:
   # for building
     - twine
     - wheel
-  # compiling FMU models from OMPython API
-    - OMPython
   # sphinx extensions
     - -r docs/requirements.txt
