@@ -18,7 +18,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: setup OpenModelica compiler
-      uses: OpenModelica/setup-openmodelica@v1.0.2
+      uses: OpenModelica/setup-openmodelica@v1.0.6
       with:
         version: 'stable'
         packages: |
