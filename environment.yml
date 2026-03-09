@@ -16,6 +16,7 @@ dependencies:
     - scikit-learn
     - scikit-optimize
     - pytensor-federated
+    - psutil
     # for code testing
     - pytest
     - pytest-cov

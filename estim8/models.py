@@ -16,6 +16,7 @@
 """This module implements the model classes for the Estim8 package.
 """
 import abc
+import logging
 import os
 import shutil
 import tempfile
@@ -24,6 +25,7 @@ from typing import Any, Dict, List, Literal
 
 import fmpy
 import numpy as np
+import psutil
 
 from .datatypes import Constants, Simulation
 from .utils import ModelHelpers
@@ -100,6 +102,7 @@ class FmuModel(Estim8Model):
         fmi_type: Literal["ModelExchange", "CoSimulation"] = "ModelExchange",
         default_parameters: dict = {},
         r_tol=1e-4,
+        memory_threshold_mb: float | None = None,
     ):
         """
         Initialize the FmuModel.
@@ -114,8 +117,13 @@ class FmuModel(Estim8Model):
             Default parameters for the model, by default {}.
         r_tol : float, optional
             Relative tolerance for the model, by default 1e-4.
+        memory_threshold_mb : float, optional
+            If set, the process RSS memory (in MB) is checked before each simulation.
+            When exceeded, the FMU instance is fully freed and re-instantiated instead
+            of just reset, releasing accumulated native memory. Default is None (disabled).
         """
         self.path = Path(path).resolve()
+        self.memory_threshold_mb = memory_threshold_mb
 
         # set fmi type and thereby load fmu
         self.fmi_type = fmi_type
@@ -272,7 +280,19 @@ class FmuModel(Estim8Model):
         Simulation
             The simulation results.
         """
-        self._fmu.reset()
+        if (
+            self.memory_threshold_mb is not None
+            and psutil.Process().memory_info().rss / 1024**2
+            > self.memory_threshold_mb
+        ):
+            logging.getLogger(__name__).debug(
+                "Memory threshold exceeded (%.1f MB), re-instantiating FMU.",
+                psutil.Process().memory_info().rss / 1024**2,
+            )
+            self.cleanup()
+            self.instantiate_fmu()
+        else:
+            self._fmu.reset()
 
         params = self.parameters.copy()
         params.update(parameters)
