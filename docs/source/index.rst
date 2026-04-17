@@ -79,6 +79,7 @@ It is advised to create a fresh virtual environent:
    :caption: Tutorials
    :maxdepth: 1
 
+   fmi-export
    notebooks/1. Modeling & Simulation
    notebooks/2. Experimental data and error modeling
    notebooks/3. Parameter estimation
