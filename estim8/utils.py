@@ -339,7 +339,7 @@ class EstimatorHelpers:
             ]
         )
         return pytensor.function(
-            [[replicate_parameters] for replicate_parameters in parameter_set_like],
+            parameter_set_like,
             [fn_result],
         )
 
