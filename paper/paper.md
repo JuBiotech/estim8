@@ -98,7 +98,7 @@ Currently, $\texttt{estim8}$ does not incorporate gradient-based optimization al
 $\texttt{estim8}$ introduces a streamlined bioprocess modeling workflow that makes rigorous hypothesis testing accessible to domain experts without extensive computational background. By combining accessible Python interfaces and FMI-compliant modeling software such as $\texttt{OpenModelica}$, $\texttt{estim8}$ allows researchers to focus on the scientific question rather than the computational implementation. With comprehensive DAE support and tailored solutions for handling experimental replicates — which are increasingly relevant in the context of laboratory automation — $\texttt{estim8}$ enables rapid iteration through cycles of model evaluation, fitting, and falsification. This lowers the barrier for model-based reasoning in biotechnological applications, supporting faster translation of experimental observations into quantitative process understanding.
 
 ### AI usage disclosure
-Claude 3.5 Sonnet was occasionally used during software development for drafting and refining implementation ides. No AI-generated code was incorporated into the software. All design decisions, code editing and reviews were conducted by the researchers. The authorship of this manuscript was conducted without the use of generative AI tools.
+Claude 3.5 Sonnet was occasionally used during software development for drafting and refining implementation ideas. No AI-generated code was incorporated into the software. All design decisions, code editing and reviews were conducted by the researchers. The authorship of this manuscript was conducted without the use of generative AI tools.
 
 
 ### Author contributions
