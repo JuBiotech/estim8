@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "estim8"
-version = "0.1.4"
+version = "0.1.5"
 authors = [
     {name = "Tobias Latour", email = "t.latour@fz-juelich.de"},
     {name = "Daniel Strohmeier", email = "d.strohmeier@fz-juelich.de"},
     ]
 description = "A parameter estimation tool for DAE models implemented compliant to the Functional Mockup Interface"
 readme = "README.md"
-requires-python = ">=3.10.0,<=3.14"
+requires-python = ">=3.10.0,<3.14"
 license = {text = "AGPLv3"}
 classifiers=[
     "Programming Language :: Python :: 3",

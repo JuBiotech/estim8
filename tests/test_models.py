@@ -1,4 +1,5 @@
 import pickle
+import platform
 from pathlib import Path
 
 import numpy as np
@@ -42,7 +43,11 @@ def test_simulate(dummy_model):
 
 
 class TestFmuModel:
-    test_fmu_path = "tests/test_data/Growth.fmu"
+    test_fmu_path = (
+        "tests/test_data/Growth.fmu"
+        if platform.system() == "Windows"
+        else "tests/test_data/Growth_linux64.fmu"
+    )
 
     def test_retrieve_variables(self):
         fmu_model = FmuModel(self.test_fmu_path)

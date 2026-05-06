@@ -34,7 +34,7 @@ jobs:
     - name: compile FMU
       shell: bash -l {0}
       run: |
-        python tests/test_data/model_compilation.py --modelname Growth
+        python tests/test_data/model_compilation.py --modelname Growth --output_name Growth_linux64
 
     - name: Set up Miniconda
       uses: conda-incubator/setup-miniconda@v3
