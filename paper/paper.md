@@ -48,6 +48,7 @@ Mathematical modeling has become a pivotal tool in biotechnological research and
 A crucial step in the modeling workflow is parameter estimation – or in layman's terms "fitting the model". This step questions the theoretical understanding of the system under investigation using real data, ultimately leading to confirmation or falsification of the hypotheses put forward. Although several general-purpose software tools for model formulation, simulation and parameter estimation exist, they currently present various limitations for biotechnological applications, particularly regarding DAE support, handling of experimental replicates, and accessibility.
 
 To address these limitations, we present $\texttt{estim8}$: a Python-based toolbox for simulation and parameter estimation of dynamic models. It is built on the Functional Mock-up Interface (FMI) standard [@RN42] and employs metaheuristic algorithms for optimization problems. $\texttt{estim8}$ provides specialized functionality for biotechnological applications, particularly in handling experimental replicates. By supporting model definition and simulation export from various FMI-compliant third-party software, including the open source OpenModelica platform [@RN22], $\texttt{estim8}$ enables comprehensive DAE support and convenient event handling.
+$\texttt{estim8}$ is designed to provide straightforward access to modeling workflows for domain experts in biotechnological research without requiring extensive computational expertise.
 
 
 # State of the Field
