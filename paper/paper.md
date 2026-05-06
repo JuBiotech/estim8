@@ -67,6 +67,7 @@ The core of $\texttt{estim8}$ is the $\texttt{Estimator}$ class, which serves as
 
 ![](estim8_workflow.png)
 __Figure 1__: Schematic overview of the $\texttt{estim8}$ workflow.
+A dynamic model is developed in a third-party FMI-compliant modeling tool (e.g. OpenModelica) and loaded into $\texttt{estim8}$ as an $\texttt{FmuModel}$. Experimental time series data from possibly multiple replicates is organized into $\texttt{Experiment}$ and $\texttt{Measurement}$ objects. The estimation problem is defined by specifying a $\texttt{ParameterMapping}$ — distinguishing global parameters shared across replicates from local replicate-specific parameters — along with parameter bounds. The $\texttt{Estimator}$ class provides three levels of analysis: point estimates via metaheuristic optimization ($\texttt{estimate()}$), parameter identifiability assessment via profile likelihood ($\texttt{profile\_likelihood()}$), and full parameter distributions via Monte Carlo sampling ($\texttt{mc\_sampling()}$), each with corresponding analysis plots.
 
 
 # Software Design
@@ -90,6 +91,7 @@ To this end, $\texttt{estim8}$ provides the option to use a so-called federated 
 
 
 __Figure 2__: Federated computation setup for differentiable objective functions.
+A population-based optimization algorithm distributes candidate global parameter sets $\theta_{global}$ across a process pool for parallel evaluation. Within each process, the objective function performs replicate handling by dispatching replicate-specific local parameter sets $\theta_{local}$ to federated worker nodes via gRPC streams. Each worker independently simulates the FMU and returns its replicate-specific likelihood contribution $\mathcal{L}(\theta_{local}|y_{local})$. Workers can be deployed across multiple machines (e.g. in a compute cluster), introducing an additional parallelization layer on top of the process pool for computationally expensive models.
 
 # Limitations
 Currently, $\texttt{estim8}$ does not incorporate gradient-based optimization algorithms, which could enhance parameter estimation efficiency through parametric sensitivities [@RN43]. This capability could be implemented once OpenModelica supports FMI 3.0 [@RN46], providing access to adjoint derivative functions, which are essential for efficiently computing gradients in high-dimensional parameter spaces. Future developments include the integration of Bayesian optimization methods from packages like $\texttt{PyMC}$ [@RN45] and $\texttt{hopsy}$ [@RN44].
