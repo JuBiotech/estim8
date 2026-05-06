@@ -29,11 +29,11 @@ It is highly recommended to use a `conda <https://docs.conda.io/projects/conda/e
 
 Installation from PyPi
 ----------------------
-It is advised to create a fresh virtual environent using ``mamba`` (or ``conda`` alternatively):
+It is advised to create a fresh virtual environent using ``mamba`` (or ``conda`` alternatively) with any Python>=3.10,<3.14:
 
 .. code-block:: bash
 
-    mamba create --name estim8 python==3.10
+    mamba create --name estim8 python=3.13
     mamba activate estim8
 
 
