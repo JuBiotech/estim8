@@ -317,6 +317,7 @@ class FmuModel(Estim8Model):
             debug_logging=True,
             model_description=self._model_description,
             fmu_instance=self._fmu,
+            terminate=False,
         )
 
         sim = {"time": sim_raw["time"]}
