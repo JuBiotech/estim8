@@ -54,7 +54,7 @@ $\texttt{estim8}$ is designed to provide straightforward access to modeling work
 # State of the Field
 
 Many established tools such as pyFOOMB [@RN30], COPASI [@RN33], PyBioNetFit [@RN34],
-and Data2Dynamics [@RN31] are limited to ODE systems, leaving users without native support for the  DAE formulations often required in biotechnological process modeling. DAE Tools [@RN35] and ModestPy [@RN36] support DAE systems but lack dedicated functionality for common biotechnological workflows such as structured handling of experimental replicates across different contidions, and therefore require substantial workarounds. The combination of AMICI [@RN32] and pyPESTO [@RN48] offers high-performance sensitivity analysis, but poses a relatively high entry barrier with respect to model formulation, making it less accessible to domain experts without extensive computational background.
+and Data2Dynamics [@RN31] are limited to ODE systems, leaving users without native support for the  DAE formulations often required in biotechnological process modeling. DAE Tools [@RN35] and ModestPy [@RN36] support DAE systems but lack dedicated functionality for common biotechnological workflows such as structured handling of experimental replicates across different conditions, and therefore require substantial workarounds. The combination of AMICI [@RN32] and pyPESTO [@RN48] offers high-performance sensitivity analysis, but poses a relatively high entry barrier with respect to model formulation, making it less accessible to domain experts without extensive computational background.
 $\texttt{estim8}$ combines FMI-based DAE support, dedicated replicate handling, and an accessible Python interface to address these gaps.
 
 
