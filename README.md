@@ -80,4 +80,4 @@ When encountering bugs using `estim8`, please bring them to our attention by ope
 ## Usage and Citing
 ``estim8`` is licensed under the [GNU Affero General Public License v3.0](https://github.com/JuBiotech/estim8/blob/main/license.md).
 
-A citable publication is coming soon.
+Head over to Zenodo to generate a BibTex citation for the latest [release](https://zenodo.org/records/21337898). In addition to the uilized software version, please cite the [publication](https://joss.theoj.org/papers/10.21105/joss.10147) over at JOSS.
