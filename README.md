@@ -2,6 +2,8 @@
 [![pipeline](https://github.com/jubiotech/estim8/workflows/pipeline/badge.svg)](https://github.com/JuBiotech/estim8/actions)
 [![coverage](https://codecov.io/gh/jubiotech/estim8/branch/main/graph/badge.svg)](https://app.codecov.io/gh/JuBiotech/estim8)
 [![documentation](https://readthedocs.org/projects/estim8/badge/?version=latest)](https://estim8.readthedocs.io/en/latest)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.10147/status.svg)](https://doi.org/10.21105/joss.10147)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21337898.svg)](https://zenodo.org/records/21337898)
 
 
 # ``estim8``
